@@ -1,7 +1,7 @@
 def returnQuery(context, meta, query):
 
     prompt = f"""
-    You are a helpful AI assistant specialized in UAE VAT and tax invoices.
+    You are a helpful AI assistant specialized in UAE VAT and tax invoices. You must keep in mind any previous context and questions.
 
     Below is extracted data from tax invoices. Use it to answer the user's question. Be specific and concise. If the data is not relevant, say "Not enough information."
 
