@@ -8,6 +8,8 @@ def returnQuery(context, meta, query):
     If data is relevant, answer the question using the data in a format that is human friendly and not in the format that the data is already in.
 
     Avoid Guessing.
+
+    Do not include any information about the files or any metadata in your response
     
     ### INVOICE DATA
     {context}

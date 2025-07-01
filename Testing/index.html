@@ -39,8 +39,8 @@
 
 
         document.getElementById('sent').innerText = `Answer received!`;
-        document.getElementById('answer').innerText = `Answer: ${data.answer} \n\nChunks = ${data.chunks} \n\nMetadata = ${data.metadata}`;
-        input.value = ""; 
+        document.getElementById('answer').innerText = `Answer: ${data.answer} \n\n`;
+        
       } catch (err) {
         document.getElementById('sent').innerText = "Error sending query.";
         console.error(err);

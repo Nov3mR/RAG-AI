@@ -8,7 +8,8 @@ format_examples = {
         "customer tax registration number",
         "clear description of the supply",
         "supply description",
-        "supply"
+        "supply",
+        "customer"
     ],
     "Box 4": [
         "exports to other gcc countries",
@@ -20,7 +21,9 @@ format_examples = {
         "customer trn",
         "customer tax registration number",
         "location of the customer",
-        "customer location"
+        "location",
+        "customer location",
+        "customer"
     ],
     "OOS": [
         "out-of-scope transactions",
@@ -39,6 +42,7 @@ format_examples = {
         "goods imported without customs",
         "non-declared imports",
         "supplier name",
+        "supplier",
         "location of the supplier",
         "supplier location",    
         "clear description of the transaction",
@@ -103,7 +107,14 @@ format_examples = {
         "pending for more than one hundred and eighty days",
         "total days due from due date as on 16 may 2025"
     ],
-    "Common":[
+    "vat": [
+        "vat amount",
+        "vat",
+        "value added tax"
+        ]
+}
+
+common = {"Common":[
         "transaction type",
         "taxpayer trn",
         "company name",
@@ -119,9 +130,4 @@ format_examples = {
         "reporting period from",
         "reporting period to",
     ],
-    "vat": [
-        "vat amount",
-        "vat",
-        "value added tax"
-        ]
 }
