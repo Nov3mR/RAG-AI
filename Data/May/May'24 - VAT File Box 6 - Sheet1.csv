@@ -1,0 +1,15 @@
+Transaction Type,Taxpayer TRN,Company Name / Member Company Name (If applicable),Tax Invoice/Tax credit note No,Tax Invoice/Tax credit note Date,Tax Invoice/Tax credit note Amount AED (before VAT),Reporting period from,Reporting period to,Supplier Name,Location of the Supplier,Name of the Customs Authority,Customs Declaration Number,Clear description of the transaction,VAT Amount AED
+01 Invoice,111111111111111,ABC LTD.,P0132842,4/18/2024,"1,315,504.55",5/1/2024,5/31/2024,Bauh,Netherlands,Dubai,"1,012,442,137,424.00",Import of Goods to Designated Free Zone,"65,775.23"
+01 Invoice,111111111111111,ABC LTD.,IN20011762/IN20011764,01/05/2024 and 06/05/2024,"4,207.73",5/1/2024,5/31/2024,Arce,UAE,Dubai,"1,020,724,534,824.00",Transfer of Goods between the Same VAT Group Entities.,210.39
+01 Invoice,111111111111111,ABC LTD.,IN20011773,5/15/2024,"114,995.00",5/1/2024,5/31/2024,Arce,UAE,Dubai,"1,020,725,243,124.00",Transfer of Goods between the Same VAT Group Entities.,"5,749.75"
+01 Invoice,111111111111111,ABC LTD.,IN20011774,5/16/2024,"2,685.94",5/1/2024,5/31/2024,Arce,UAE,Dubai,"1,020,725,343,124.00",Transfer of Goods between the Same VAT Group Entities.,134.3
+01 Invoice,111111111111111,ABC LTD.,IN20011785/IN20011786,5/21/2024,"185,503.45",5/1/2024,5/31/2024,Arce,UAE,Dubai,"1,020,726,183,424.00",Transfer of Goods between the Same VAT Group Entities.,"9,275.17"
+01 Invoice,111111111111111,ABC LTD.,IN20011791,5/22/2024,"297,100.70",5/1/2024,5/31/2024,Arce,UAE,Dubai,"1,020,726,290,824.00",Transfer of Goods between the Same VAT Group Entities.,"14,855.04"
+01 Invoice,111111111111111,ABC LTD.,IN20011804,5/27/2024,"126,494.49",5/1/2024,5/31/2024,Arce,UAE,Dubai,1020726982124,Transfer of Goods between the Same VAT Group Entities.,"6,324.72"
+01 Invoice,111111111111111,ABC LTD.,IN20011799,5/23/2024,"245,744.00",5/1/2024,5/31/2024,Arce,UAE,Sharjah,1-1-55-1-24-45416,Transfer of Goods between the Same VAT Group Entities.,"12,287.20"
+01 Invoice,111111111111111,ABC LTD.,IN20011818,5/28/2024,"34,753.75",5/1/2024,5/31/2024,Arce,UAE,Dubai,1020727139224,Transfer of Goods between the Same VAT Group Entities.,"1,737.69"
+01 Invoice,111111111111111,ABC LTD.,IN20011802/IN20011803,23/05/2024 and 27/05/2024,"166,577.07",5/1/2024,5/31/2024,Arce,UAE,Dubai,1020727099924,Transfer of Goods between the Same VAT Group Entities.,"8,328.85"
+01 Invoice,111111111111111,ABC LTD.,IN20011819,5/28/2024,431.24,5/1/2024,5/31/2024,Arce,UAE,Dubai,1020727107524,Transfer of Goods between the Same VAT Group Entities.,21.56
+01 Invoice,111111111111111,ABC LTD.,IN20011763/TI20000251,06/05/2024 and 20/05/2024,"181,427.22",5/1/2024,5/31/2024,Arce,UAE,Dubai,1020727600924,Transfer of Goods between the Same VAT Group Entities.,"9,071.36"
+01 Invoice,111111111111111,ABC LTD.,IN20011836,6/3/2024,"15,339.61",5/1/2024,5/31/2024,Arce,UAE,Dubai,1020727763424,Import of Goods to Designated Free Zone,766.98
+01 Invoice,111111111111111,ABC LTD.,IN20011828,5/31/2024,"891,489.23",5/1/2024,5/31/2024,Arce,UAE,Dubai,1020727734024,Transfer of Goods between the Same VAT Group Entities.,"44,574.46"

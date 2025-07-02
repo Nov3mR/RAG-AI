@@ -1,11 +1,10 @@
 import os
 import pandas as pd
 from pathlib import Path
-import json
 import re
 
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "Data"
+DATA_DIR = Path(__file__).resolve().parent.parent / "Data" / "May"
 
 def load_format_a(df):
 
@@ -88,7 +87,28 @@ def row_to_chunk_json_with_invoice(row):
 
     invoice_no = str(data[invoice_no_key]).strip().lower() if invoice_no_key else None
 
-    return invoice_no
+    trn_key = next(
+        (key for key in data if "supplier trn" in key.lower() or "customer trn" in key.lower()), 
+        None
+    )
+
+    if trn_key and trn_key in data:
+        val = data[trn_key]
+        try:
+            # Try to convert to float then int to remove trailing .0 if numeric
+            trn = str(int(float(val)))
+        except (ValueError, TypeError):
+           
+            val_str = str(val).strip().lower()
+            if val_str.endswith(".0"):
+                val_str = val_str[:-2]
+            trn = val_str
+    else:
+        trn = "N/A"
+
+    # N/A for SAR, 3, 6, 7
+
+    return invoice_no, trn
 
 def clean_vals(val):
     valStr = str(val)
@@ -125,18 +145,19 @@ def df_to_chunks(df, prefix=None, filename=None, format=None):
     chunks = []
     metadatas = []
     for _, row in df.iterrows():
-        chunk, tType, trn, company_name = row_to_chunk(row=row)
+        chunk, tType, company_trn, company_name = row_to_chunk(row=row)
         chunk = chunk.replace("\n", " ").replace("  ", " ")
-        invoiceNo = row_to_chunk_json_with_invoice(row=row)
+        invoiceNo, trn = row_to_chunk_json_with_invoice(row=row)
         invoiceNo = invoiceNo.lower() if invoiceNo else None
         chunks.append(chunk.lower())
         metadatas.append({
             "chunk": chunk,
             "source_file": filename or prefix or "unknown",
             "prefix": prefix if prefix else tType,
-            "trn": trn if trn else "Aging Report - No TRN",
+            "company_trn": company_trn if company_trn else "Aging Report - No TRN",
             "company_name": company_name if company_name else "Aging Report - No Company Name",
             "invoice_no": invoiceNo,
+            "trn": trn,
             'format': format if format else None
         })
 

@@ -1,0 +1,13 @@
+Transaction Type,Taxpayer TRN,Company Name / Member Company Name (If applicable),Tax Invoice/Tax credit note No,Tax Invoice/Tax credit note Date,Reporting period from,Reporting period to,Tax Invoice/Tax credit note Amount AED (before VAT),Clear description of the supply,Customer Name,"Customer TRN 
+ (if applicable)",Location of the Customer
+01 Invoice,111111111111111,ABC LTD.,2TDN160715,5/30/2024,5/1/2024,5/31/2024,"95,119.55",Export of Services - Interest Income on Deposits,ARCE,NA,France
+01 Invoice,111111111111111,ABC LTD.,2TDN160716,5/30/2024,5/1/2024,5/31/2024,0.05,Export of Services - Interest Income on Deposits,ARCE,NA,France
+01 Invoice,111111111111111,ABC LTD.,2TDN160717,5/30/2024,5/1/2024,5/31/2024,604.41,Export of Services - Interest Income on Deposits,ARCE,NA,France
+01 Invoice,111111111111111,ABC LTD.,2TDN160718,5/30/2024,5/1/2024,5/31/2024,"140,642.02",Export of Services - Interest Income on Deposits,ARCE,NA,France
+01 Invoice,111111111111111,ABC LTD.,1TDN160066,5/30/2024,5/1/2024,5/31/2024,272.92,Export of Services - Interest Income on Deposits,ARCE,NA,France
+01 Invoice,111111111111111,ABC LTD.,1TDN160067,5/30/2024,5/1/2024,5/31/2024,5.25,Export of Services - Interest Income on Deposits,ARCE,NA,France
+01 Invoice,111111111111111,ABC LTD.,1TDN160068,5/30/2024,5/1/2024,5/31/2024,41.55,Export of Services - Interest Income on Deposits,ARCE,NA,France
+01 Invoice,111111111111111,ABC LTD.,1TDN160069,5/30/2024,5/1/2024,5/31/2024,54.79,Export of Services - Interest Income on Deposits,ARCE,NA,France
+01 Invoice,111111111111111,ABC LTD.,1TDN160070,5/30/2024,5/1/2024,5/31/2024,114.77,Export of Services - Interest Income on Deposits,ARCE,NA,France
+01 Invoice,111111111111111,ABC LTD.,TI20000253,5/17/2024,5/1/2024,5/31/2024,"25,537.02",Freight Charges for sea shipment - UAE to Outside UAE,ACER,NA,Tanzania
+01 Invoice,111111111111111,ABC LTD.,TI70001473,5/31/2024,5/1/2024,5/31/2024,"24,197.40",Rental Income SP - From a customer Outside UAE,ALGH,NA,Bahrain

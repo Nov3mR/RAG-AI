@@ -16,4 +16,3 @@ def call_LLM(prompt: str) -> str:
     except requests.exceptions.RequestException as e:
         print("Ollama call failed:", e)
         return "Error: Could not get a response from the LLM"
-
