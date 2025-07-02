@@ -171,12 +171,8 @@ def find_query_format(query_text):
 
     if formats:
             
-        if formats[0] == "SAR" or formats[0] == "OOS":
-            if customer ^ supplier:
-                formats = ["SAR" if customer else "OOS"]
-            else:
-                formats = formats[:2]
-        elif 'vat' in formats and "Box 4" in formats:
+        
+        if 'vat' in formats and "Box 4" in formats:
             formats.remove("Box 4")
             formats.remove('vat')
         else:
@@ -188,7 +184,6 @@ def find_query_format(query_text):
                 (customer and supplier):
                     filtered.append(label)
                 else:
-                    # Remove label from array
                     print("Removing:", label)
 
             formats = filtered if filtered else []
@@ -273,7 +268,7 @@ def rank_other_chunks(query, chunks):
   
     ranked_chunks = [chunk for chunk, score in top_results]
 
-    return ranked_chunks
+    return ranked_chunks[:5]
 
 def query_chroma(collection, query_text, n_results):
 

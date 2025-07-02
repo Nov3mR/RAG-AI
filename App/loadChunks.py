@@ -73,7 +73,6 @@ def load_all_data():
 
     return vat_dfs, aging_dfs
 
-
 def row_to_chunk_json_with_invoice(row):
     data = {
         k.strip(): v
@@ -90,7 +89,6 @@ def row_to_chunk_json_with_invoice(row):
     invoice_no = str(data[invoice_no_key]).strip().lower() if invoice_no_key else None
 
     return invoice_no
-
 
 def clean_vals(val):
     valStr = str(val)
@@ -123,7 +121,6 @@ def row_to_chunk(row):
 
     return chunk, prefix, trn, company_name
 
-
 def df_to_chunks(df, prefix=None, filename=None, format=None):
     chunks = []
     metadatas = []
@@ -145,11 +142,8 @@ def df_to_chunks(df, prefix=None, filename=None, format=None):
 
     return chunks, metadatas
 
-
-vatFiles, agingFiles = load_all_data()
-
-
 def create_chunks():
+    vatFiles, agingFiles = load_all_data()  
     allChunks = []
     allMetadatas = []
     for fname, df, format in vatFiles:
@@ -163,7 +157,6 @@ def create_chunks():
         allMetadatas.extend(agingMetas)
 
     return allChunks, allMetadatas
-
 
 
 if __name__ == "__main__":

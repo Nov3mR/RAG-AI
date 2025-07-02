@@ -27,7 +27,9 @@ class Query(BaseModel):
     query: str
 
 @app.post('/query')
-def returnResults(q: Query):
+async def returnResults(q: Query):
+
+    
     query = q.query
 
     topChunks, topMetas, topIds, originalText, raw = retrieve_relevant_chunks(query=query)
@@ -48,7 +50,6 @@ def returnResults(q: Query):
     totalTime = endTime - startTime
 
     print(f"Time elapsed: {totalTime}")
-    print(f"Chunks: {topChunks}")
     print(f"Raw: {originalText}")
 
     return {
@@ -60,10 +61,7 @@ def returnResults(q: Query):
     }
 
 
-
 if __name__ == "__main__":
     chunks, metas, ids, originalText, raw = retrieve_relevant_chunks("what is the location of customer bauh")
     meta = metas[0]
     print(meta['invoice_no'])
-
-    
