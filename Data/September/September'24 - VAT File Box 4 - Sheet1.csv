@@ -1,0 +1,18 @@
+Transaction Type,Taxpayer TRN,Company Name / Member Company Name (If applicable),Tax Invoice/Tax credit note No,Tax Invoice/Tax credit note Date,Reporting period from,Reporting period to,Tax Invoice/Tax credit note Amount AED (before VAT),Clear description of the supply,Customer Name,"Customer TRN 
+ (if applicable)",Location of the Customer
+01 Invoice,111111111111111,ABC LTD.,2TDN160750,9/29/2024,9/1/2024,9/30/2024,"104,166.94",Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,2TDN160751,9/29/2024,9/1/2024,9/30/2024,0.05,Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,2TDN160752,9/29/2024,9/1/2024,9/30/2024,"1,299.39",Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,2TDN160753,9/29/2024,9/1/2024,9/30/2024,793.74,Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,2TDN160754,9/29/2024,9/1/2024,9/30/2024,"174,959.00",Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,5HTDN0011,9/29/2024,9/1/2024,9/30/2024,"10,958.99",Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,5HTDN0012,9/29/2024,9/1/2024,9/30/2024,"24,796.11",Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,5HTDN0013,9/29/2024,9/1/2024,9/30/2024,0.26,Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,5HTDN0014,9/29/2024,9/1/2024,9/30/2024,"37,511.32",Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,1TDN160086,9/29/2024,9/1/2024,9/30/2024,"5,001.94",Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,1TDN160087,9/29/2024,9/1/2024,9/30/2024,4.85,Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,1TDN160088,9/29/2024,9/1/2024,9/30/2024,39.01,Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,1TDN160089,9/29/2024,9/1/2024,9/30/2024,53.31,Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,1TDN160090,9/29/2024,9/1/2024,9/30/2024,110.32,Export of Services - Interest Income on Deposits from Treasury for September 2024,ARCE,Not Applicable,France
+01 Invoice,111111111111111,ABC LTD.,TI70001833,9/30/2024,9/1/2024,9/30/2024,"17,436.18",Export of Services - Rental Income SP - Sept'24 billing,ALGH,Not Applicable,Bahrain
+01 Invoice,111111111111111,ABC LTD.,2TDN160743,9/30/2024,9/1/2024,9/30/2024,"537,446.70",Export of Services - Staff cost Q3'2024,ARCE,Not Applicable,Netherlands

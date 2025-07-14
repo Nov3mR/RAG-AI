@@ -1,0 +1,23 @@
+Transaction Type,Taxpayer TRN,Company Name / Member Company Name (If applicable),Tax Invoice/Tax credit note No,Tax Invoice/Tax credit note Date,Tax Invoice/Tax credit note Amount AED (before VAT),Reporting period from,Reporting period to,Supplier Name,Location of the Supplier,Name of the Customs Authority,Customs Declaration Number,Clear description of the transaction,VAT Amount AED
+01 Invoice,111111111111111,ABC LTD.,IN20011918,7/1/2024,"172,736.72",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020733852024,Supply of Goods by an entity within the same VAT Group.,"8,636.84"
+01 Invoice,111111111111111,ABC LTD.,,6/27/2024,"7,627.00",7/1/2024,7/31/2024,,,SHJ,‌1-1-55-1-24-57399,Import of Goods to Designated Free Zone.,381.35
+01 Invoice,111111111111111,ABC LTD.,,7/3/2024,"16,459.38",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020734451124,Import of Goods to Designated Free Zone.,822.97
+01 Invoice,111111111111111,ABC LTD.,,7/3/2024,406.41,7/1/2024,7/31/2024,,,DXB,‌1012486497324,Import of Goods to Designated Free Zone.,20.32
+01 Invoice,111111111111111,ABC LTD.,IN20011928,7/4/2024,"27,561.79",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020734688324,Supply of Goods by an entity within the same VAT Group.,"1,378.09"
+01 Invoice,111111111111111,ABC LTD.,,7/8/2024,"11,417.28",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020735171324,Import of Goods to Designated Free Zone.,570.86
+01 Invoice,111111111111111,ABC LTD.,,7/8/2024,950.03,7/1/2024,7/31/2024,,,DXB,‌1012490100624,Import of Goods to Designated Free Zone.,47.5
+01 Invoice,111111111111111,ABC LTD.,IN20011932,7/8/2024,"55,375.58",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020735243024,Supply of Goods by an entity within the same VAT Group.,"2,768.78"
+01 Invoice,111111111111111,ABC LTD.,IN20011953,7/9/2024,"45,921.48",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020735297124,Supply of Goods by an entity within the same VAT Group.,"2,296.07"
+01 Invoice,111111111111111,ABC LTD.,IN20011951/11966/11967/11970,7/10/2024,"177,213.52",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020735655324,Supply of Goods by an entity within the same VAT Group.,"8,860.68"
+01 Invoice,111111111111111,ABC LTD.,IN20011983/984/986,7/17/2024,"656,051.61",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020737143824,Supply of Goods by an entity within the same VAT Group.,"32,802.58"
+01 Invoice,111111111111111,ABC LTD.,IN20011985/989,7/17/2024,"66,560.23",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020737279424,Supply of Goods by an entity within the same VAT Group.,"3,328.01"
+01 Invoice,111111111111111,ABC LTD.,,7/18/2024,697.98,7/1/2024,7/31/2024,,UAE,DXB,‌1012496849724,Import of Goods to Designated Free Zone.,34.9
+01 Invoice,111111111111111,ABC LTD.,IN20011990,7/18/2024,"55,123.40",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020737523224,Supply of Goods by an entity within the same VAT Group.,"2,756.17"
+01 Invoice,111111111111111,ABC LTD.,IN20011987/974,7/18/2024,"904,674.18",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020737480924,Supply of Goods by an entity within the same VAT Group.,"45,233.71"
+01 Invoice,111111111111111,ABC LTD.,,7/30/2024,"1,381,279.78",7/1/2024,7/31/2024,,,DXB,‌1012442137424,Import of Goods to Designated Free Zone.,"69,063.99"
+01 Invoice,111111111111111,ABC LTD.,,7/25/2024,"143,305.96",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020583635121,Import of Goods to Designated Free Zone.,"7,165.30"
+01 Invoice,111111111111111,ABC LTD.,,7/28/2024,"1,544.11",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020739621624,Import of Goods to Designated Free Zone.,77.21
+01 Invoice,111111111111111,ABC LTD.,IN20012011,7/29/2024,"438,990.61",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020739899524,Supply of Goods by an entity within the same VAT Group.,"21,949.53"
+01 Invoice,111111111111111,ABC LTD.,IN20011991/997/12000,7/29/2024,"220,978.19",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020739846924,Supply of Goods by an entity within the same VAT Group.,"11,048.91"
+01 Invoice,111111111111111,ABC LTD.,IN20012010/11930/11952,7/30/2024,"30,554.18",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020740048924,Supply of Goods by an entity within the same VAT Group.,"1,527.71"
+01 Invoice,111111111111111,ABC LTD.,IN20012006/007/008,7/30/2024,"107,207.54",7/1/2024,7/31/2024,AM DSTC FZE,UAE,DXB,‌1020740058624,Supply of Goods by an entity within the same VAT Group.,"5,360.38"

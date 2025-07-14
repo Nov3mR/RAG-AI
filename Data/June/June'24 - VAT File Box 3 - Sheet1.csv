@@ -1,0 +1,53 @@
+Transaction Type,Taxpayer TRN,Company Name / Member Company Name (If applicable),Tax Invoice/Tax credit note No,Tax Invoice/Tax credit note Date,Reporting period from,Reporting period to,Tax Invoice/Tax credit note Amount AED (before VAT),Supplier Name,Location of the Supplier,Clear description of the transaction,VAT Amount AED
+01 Invoice,1.11111E+14,ABC LTD.,2401645,5/2/2024,6/1/2024,6/30/2024,"116,528.43",STEE,Belgium,SEA FREIGHT FOR JEBEL ALI - 19X40,"5,826.42"
+01 Invoice,1.11111E+14,ABC LTD.,2410011555,6/14/2024,6/1/2024,6/30/2024,"47,519.72",ARCE,Netherlands,"Training Expenses – (E)
+ Re-invoiced costs & fees - G&A Invoicing DSS
+ costs part III","2,375.99"
+01 Invoice,1.11111E+14,ABC LTD.,2410011589,6/21/2024,6/1/2024,6/30/2024,"63,758.68",ARCE,Netherlands,"Corporate Fees
+ Management Fees Business Line Energy Projects April - June 2024","3,187.93"
+01 Invoice,1.11111E+14,ABC LTD.,2821,6/20/2024,6/1/2024,6/30/2024,"5,509.12",SUMM,Kenya,"Salaries&Wages
+ alaries&Wages for East Africa - June 2024",275.46
+01 Invoice,1.11111E+14,ABC LTD.,BA5/2406593,6/24/2024,6/1/2024,6/30/2024,"108,557.67",ARCE,Belgium,Sea Frieght Inbound,"5,427.88"
+01 Invoice,1.11111E+14,ABC LTD.,I0031039,1/26/2024,6/1/2024,6/30/2024,"2,328.37",WORL,India,"Air Ticket Expenses
+ NIKHIL GARG 
+ DXB TUU DXB - 30 JAN 2024",116.42
+01 Invoice,1.11111E+14,ABC LTD.,I0032241,4/20/2024,6/1/2024,6/30/2024,"2,831.46",WORL,India,"Air Ticket Expenses
+ SOPHY ELECTOR OCHUODHO
+ NBO KGL EBB KGL NBO - 22 APRIL 2024",141.57
+01 Invoice,1.11111E+14,ABC LTD.,I0032496,5/16/2024,6/1/2024,6/30/2024,"11,274.69",WORL,India,"Air Ticket Expenses
+ ANAND BHUSHAN DUBEY
+ KALPESH MISTRY
+ RAKESH GODARA
+ SATTWIK KAR
+ CCU/DXB/CCU-19 MAY 2024",563.73
+01 Invoice,1.11111E+14,ABC LTD.,I0032529,5/18/2024,6/1/2024,6/30/2024,"1,854.58",WORL,India,"Employee Ticket (BC)
+ ANAND SINGH
+ DXB DEL DXB - 03 JULY 2024",92.73
+01 Invoice,1.11111E+14,ABC LTD.,I0032584,5/27/2024,6/1/2024,6/30/2024,694.07,WORL,India,"Air Ticket Expenses
+ ASEED SAMEH ALAZAAM
+ RUH TUU RUH-02 JUNE 2024",34.7
+01 Invoice,1.11111E+14,ABC LTD.,I0032590,5/28/2024,6/1/2024,6/30/2024,"1,057.68",WORL,India,"Air Ticket Expenses
+ ANAND BHUSHAN DUBEY
+ KALPESH MISTRY
+ RAKESH GODARA
+ SATTWIK KAR
+ CCU/DXB/CCU-19 MAY 2024",52.88
+01 Invoice,1.11111E+14,ABC LTD.,I0032591,5/29/2024,6/1/2024,6/30/2024,991.58,WORL,India,"Air Ticket Expenses
+ HANY ELSAYED
+ DXB RUH DXB-03 JUNE 2024",49.58
+01 Invoice,1.11111E+14,ABC LTD.,I0032592,5/29/2024,6/1/2024,6/30/2024,"1,347.77",WORL,India,"Air Ticket Expenses
+ GAYTREE DANDEKAR 
+ DOH/DXB/DOH-02 JUNE 2024",67.39
+01 Invoice,1.11111E+14,ABC LTD.,I0032613,5/30/2024,6/1/2024,6/30/2024,"1,366.17",WORL,India,"Air Ticket Expenses
+ HANY ELSAYED
+ DXB RUH DXB-03 JUNE 2024",68.31
+01 Invoice,1.11111E+14,ABC LTD.,INV-MHO/052/2425,6/29/2024,6/1/2024,6/30/2024,"9,552.17",ARCE,India,"Salaries&Wages
+ Reimbursement of expenses for month of June 2024
+ Expenses 
+ Marck up @ 15% on above
+ Total with Mark up
+ Integrated Goods & Services Tax @ 18%",477.61
+01 Invoice,1.11111E+14,ABC LTD.,SMDYN/001/06-2024,6/7/2024,6/1/2024,6/30/2024,"13,771.88",SMDY,India,"Professional /Consultancy Fees
+ Microsoft Dynamics AX 2012 R3 Support Services
+ May to July 2024 (for 12.5 person days contracted)",688.59
+,,,,,,,,,,,

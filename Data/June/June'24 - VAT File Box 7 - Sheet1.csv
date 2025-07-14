@@ -1,0 +1,11 @@
+Transaction Type,Taxpayer TRN,Company Name / Member Company Name (If applicable),Tax Invoice/Tax credit note No,Tax Invoice/Tax credit note Date,Tax Invoice/Tax credit note Amount AED (before VAT),Reporting period from,Reporting period to,Supplier Name,Location of the Supplier,Name of the Customs Authority,Customs Declaration Number,Clear description of the transaction,VAT Amount AED
+01 Invoice,111111111111111,ABC LTD.,PO50004710 - I,4/22/2024,"7,448.96",6/1/2024,6/30/2024,XINX,China,DXB,"1,012,464,467,224.00",Import of Goods to Designated Free Zone.,372.45
+01 Invoice,111111111111111,ABC LTD.,ES0442/24,5/31/2024,"56,165.11",6/1/2024,6/30/2024,IBIX,Italy,DXB,"1,012,466,705,524.00",Import of Goods to Designated Free Zone.,"2,808.26"
+01 Invoice,111111111111111,ABC LTD.,LI2408280,6/4/2024,"4,151.42",6/1/2024,6/30/2024,LUIS,Germany,DXB,"1,012,466,205,424.00",Import of Goods to Designated Free Zone.,207.57
+01 Invoice,111111111111111,ABC LTD.,002ADF24,6/5/2024,"28,481.25",6/1/2024,6/30/2024,ABN,UAE,DXB,1020728658324,Import of Goods to Designated Free Zone.,"1,424.06"
+01 Invoice,111111111111111,ABC LTD.,SAM-69/2024-2025,6/1/2024,973.29,6/1/2024,6/30/2024,Grau,India,DXB,"1,012,468,001,324.00",Import of Goods to Designated Free Zone.,48.66
+01 Invoice,111111111111111,ABC LTD.,LI2408375,6/6/2024,"3,688.75",6/1/2024,6/30/2024,LUIS,Germany,DXB,1012468139824,Import of Goods to Designated Free Zone.,184.44
+01 Invoice,111111111111111,ABC LTD.,SDGH/1617,6/8/2024,"3,595.28",6/1/2024,6/30/2024,STAR,India,DXB,1012473253124,Import of Goods to Designated Free Zone.,179.76
+01 Invoice,111111111111111,ABC LTD.,240000395/24-FC,6/21/2024,"1,705.26",6/1/2024,6/30/2024,INTE,UAE,DXB,1020731921224,Import of Goods to Designated Free Zone.,85.26
+01 Invoice,111111111111111,ABC LTD.,P0132842CI02,6/20/2024,"11,265.96",6/1/2024,6/30/2024,Bauh,Netherlands,DXB,1012480104924,Import of Goods to Designated Free Zone.,563.30
+01 Invoice,111111111111111,ABC LTD.,20240409,6/20/2024,"52,500.00",6/1/2024,6/30/2024,ULTR,UAE,SHJ,1-3-60-1-24-54573,Import of Goods to Designated Free Zone.,"2,625.00"

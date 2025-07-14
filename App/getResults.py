@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 import sys
@@ -10,6 +11,7 @@ import chromadb
 from sentence_transformers import SentenceTransformer, util, CrossEncoder
 from formatExamples import format_examples
 from loadChunks import create_chunks
+from getQuery import returnQuery
 
 os.environ["HF_HUB_DISABLE_SSL_VERIFICATION"] = "1"
 
@@ -39,12 +41,28 @@ def loadOrCreateEmbeddings():
             "chunk": chunks,
             "embedding": embeddings.tolist(),
             "source_file": [meta["source_file"] for meta in metas],
-            "invoice_no": [meta["invoice_no"] for meta in metas],
-            "trn": [meta["trn"] for meta in metas],
+            "format": [meta["format"] for meta in metas],
             "prefix": [meta["prefix"] for meta in metas],
             "company_trn": [meta["company_trn"] for meta in metas],
             "company_name": [meta["company_name"] for meta in metas],
-            "format": [meta["format"] for meta in metas],
+            "name": [meta["name"] for meta in metas],
+            "voucher_no": [meta["voucher_no"] for meta in metas],
+            "invoice_no": [meta["invoice_no"] for meta in metas],
+            "invoice_date": [meta["invoice_date"] for meta in metas],
+            "due_date": [meta["due_date"] for meta in metas],
+            "total_invoice_amount": [meta["total_invoice_amount"] for meta in metas],
+            "vat_amount": [meta["vat_amount"] for meta in metas],
+            "amount_paid": [meta["amount_paid"] for meta in metas],
+            "amount_pending": [meta["amount_pending"] for meta in metas],
+            "days_due": [meta["days_due"] for meta in metas],
+            "date_received": [meta["date_received"] for meta in metas],
+            "trn": [meta["trn"] for meta in metas],
+            "location": [meta["location"] for meta in metas],
+            "customs_auth": [meta["customs_auth"] for meta in metas],
+            "customs_number": [meta["customs_number"] for meta in metas],
+            "vat_recovered": [meta["vat_recovered"] for meta in metas],
+            "vat_adjustments": [meta["vat_adjustments"] for meta in metas],
+            "month": [meta["month"] for meta in metas],
             "raw": [meta["chunk"] for meta in metas],
             "id": [f"chunk_{i}" for i in range(len(chunks))]
             # "company_name": metas["company_name"][0] if "company_name" in metas else None,  # Assuming all chunks have the same company name
@@ -64,7 +82,7 @@ def chromaDBSetup(df):
 
     documents = df["chunk"].astype(str).tolist()
     embeddings = df["embedding"].tolist()
-    metadatas = df[["source_file", "invoice_no", "trn", 'prefix', 'company_trn', 'company_name', 'format', "raw"]].to_dict(orient="records")
+    metadatas = df[["source_file", "format", "prefix", "company_trn", "company_name", "name", "voucher_no", "invoice_no", "invoice_date", "due_date", "total_invoice_amount", "vat_amount", "amount_paid", "amount_pending", "days_due", "date_received", "trn", "location", "customs_auth", "customs_number", "vat_recovered", "vat_adjustments", "month", "raw"]].to_dict(orient="records")
     ids = df["id"].tolist()
 
 
@@ -218,7 +236,6 @@ def rerank_chunks(query, retrieved_chunks, metadatas, ids, distances):
 
     return ranked_chunks, ranked_metas, ranked_scores, ranked_ids, ranked_distances
 
-
 def rank_other_chunks(query, raw, chunks, metadatas, ids, distances):
     model = SentenceTransformer("intfloat/e5-small-v2")
 
@@ -253,7 +270,7 @@ def rank_other_chunks(query, raw, chunks, metadatas, ids, distances):
 
     return results, ranked_raw
 
-def query_by_format_priority(collection, query_text, embedded_query, format_priority_list, top_k, n_results):
+def query_by_format_priority(collection, query_text, embedded_query, format_priority_list, top_k, n_results, months):
 
     raw = []
     ids = []
@@ -306,20 +323,27 @@ def query_chroma(collection, query_text, n_results):
     formats = find_query_format(query_text)
     allFormats = ["SAR", "Box 1", "Box 3", "Box 4", "Box 6/7", "Box 9", "OOS"]
 
+    allMonths = ["May", "June", "July", "August", "September", "SAR"]
+    months = [month for month in allMonths if month.lower() in query_text.lower()]
+       
+
     invoice_pattern = r"\b(?:invoice(?: number| no)?|tax invoice(?:/tax credit note)?(?: number| no)?)[:\s]*([0-9][A-Z0-9/\-]*)"
     trn_pattern = r'\b\d{15}\b|\b\d{5,6}[Xx]{4,6}\d{4,6}\b'
+    # month_pattern = 
 
     invoice_matches = re.findall(invoice_pattern, query_text, re.IGNORECASE)
     trn_matches = re.findall(trn_pattern, query_text, re.IGNORECASE)
 
     print(trn_matches)
-
+ 
     if len(invoice_matches) > 0:
         print([f"Detected invoice numbers in query: {match}" for match in invoice_matches])
         results = collection.query(
             query_embeddings=embedded_query,
             n_results=n_results,
-            where={"invoice_no": {"$in": invoice_matches}},
+            where={"invoice_no": {"$in": invoice_matches},
+                   "month": {"$in": months if months else ["May", "SAR"]}
+                   }
         )
         raw = [meta["raw"] for sublist in results["metadatas"] for meta in sublist]
 
@@ -328,7 +352,9 @@ def query_chroma(collection, query_text, n_results):
         results = collection.query(
             query_embeddings=embedded_query,
             n_results=n_results,
-            where={"trn": {"$in": trn_matches}},
+            where={"trn": {"$in": trn_matches},
+                   "month": {"$in": months if months else ["May", "SAR"]}
+                   }
         )
         raw = [meta["raw"] for sublist in results["metadatas"] for meta in sublist]
         
@@ -345,21 +371,97 @@ def query_chroma(collection, query_text, n_results):
 
         print(top_k, n_results)
 
-        results, raw = query_by_format_priority(collection, query_text, embedded_query, formats, top_k, n_results)
+        results, raw = query_by_format_priority(collection, query_text, embedded_query, formats, top_k, n_results, months=months if months else ["May", "SAR"])
     else:
         print("No formats detected, running general semantic search.")
-        results, raw = query_by_format_priority(collection, query_text, embedded_query, allFormats, 1, 7)
+        results, raw = query_by_format_priority(collection, query_text, embedded_query, allFormats, 1, 7, months=months if months else ["May", "SAR"])
         results, raw = rank_other_chunks(query_text, raw, results["documents"], results["metadatas"], results["ids"], results["distances"])
 
     print(formats)
     return results, raw
 
+def perform_arithmetic_from_llm(df: pd.DataFrame, llm_json: str):
+    # Load the JSON
+    query_json = llm_json
+    operation = query_json["operation"]
+    field = query_json["field"]
+    filters = query_json.get("filters", {})
+
+    # Apply filters
+    df_filtered = df.copy()
+
+    for col, condition in query_json["filters"].items():
+        if condition == "" or type(condition) != str or (condition.startswith("<") and condition.endswith(">")):
+            continue
+        elif condition.startswith(">="):
+            value = float(condition[2:])
+            df_filtered = df_filtered[pd.to_numeric(df_filtered[col], errors='coerce') >= value]
+        elif condition.startswith("<="):
+            value = float(condition[2:])
+            df_filtered = df_filtered[pd.to_numeric(df_filtered[col], errors='coerce') <= value]
+        elif condition.startswith(">"):
+            value = float(condition[1:])
+            df_filtered = df_filtered[pd.to_numeric(df_filtered[col], errors='coerce') > value]
+        elif condition.startswith("<"):
+            value = float(condition[1:])
+            df_filtered = df_filtered[pd.to_numeric(df_filtered[col], errors='coerce') < value]
+        elif condition.strip().replace('.', '', 1).isdigit() or condition.strip().lstrip('-').replace('.', '', 1).isdigit():
+            value = float(condition)
+            df_filtered = df_filtered[pd.to_numeric(df_filtered[col], errors='coerce') == value]
+            print(df_filtered)
+        else:
+            raise ValueError(f"Unsupported condition: {condition}")
+
+    if operation in ["sum", "average", "min", "max"]:
+        df_filtered[field] = pd.to_numeric(df_filtered[field], errors='coerce') 
+
+    if operation == "count":
+        result = df_filtered[field].count()
+    elif operation == "sum":
+        result = df_filtered[field].sum()
+    elif operation == "average":
+        result = df_filtered[field].mean()
+    elif operation == "max":
+        result = df_filtered[field].max()
+    elif operation == "min":
+        result = df_filtered[field].min()
+    else:
+        raise ValueError(f"Unsupported operation: {operation}")
+    
+    print(result)
+
+    return result
+
 def retrieve_relevant_chunks(query, top_k=5):
-    query = query.lower()
-    print(query)
+    # jsonQuery, newQuery, arithmeticData = returnQuery(query=query)
+
+    # try:
+    #     arithmeticData = json.loads(arithmeticData.strip())
+    # except json.JSONDecodeError:
+    #     print("Invalid JSON received from LLM:", arithmeticData)
+    #     arithmeticData = {}
+
+    # print(jsonQuery)
+
+    # parsed = json.loads(jsonQuery)
+
+    # searchQuery = " | ".join(f"{k}: {v}" for k, v in parsed.items() if k != "query" and v is not None and v not in ["", "null"] and str(v).strip() != "")
+
+    # print(searchQuery)
+    # print(newQuery)
+    # print(arithmeticData)
+
     df = loadOrCreateEmbeddings()
     collection = chromaDBSetup(df)
-    results, raw = query_chroma(collection, query, n_results=top_k)
+
+    needArithmetic = False
+
+    # if arithmeticData.get("field", "").lower() != "none" and arithmeticData != {}:
+    #     arithmeticResult = perform_arithmetic_from_llm(df, arithmeticData)
+    #     needArithmetic = True
+
+
+    results, raw = query_chroma(collection, query.lower(), n_results=top_k) # searchQuery.lower() if searchQuery != "" else newQuery
 
     originalText = []
 
@@ -372,10 +474,12 @@ def retrieve_relevant_chunks(query, top_k=5):
                     originalText.append(subitem.get("raw", ""))
 
 
-    return results["documents"], results["metadatas"], results["ids"], originalText
+    return results["documents"], results["metadatas"], results["ids"], originalText, query, arithmeticResult if needArithmetic else None
 
 
 if __name__ == "__main__":
-    docs, metas, ids, originalText = retrieve_relevant_chunks("Invoice Number 240530045")
+    docs, metas, ids, originalText, query, arithmeticResult = retrieve_relevant_chunks("How many invoices have not been paid at all in the supplier aging report")
     for i, text in enumerate(originalText):
         print(f"\n\nText {i}: {text}")
+    print(arithmeticResult)
+    

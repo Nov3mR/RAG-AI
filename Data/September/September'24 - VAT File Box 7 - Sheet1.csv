@@ -1,0 +1,3 @@
+Transaction Type,Taxpayer TRN,Company Name / Member Company Name (If applicable),Tax Invoice/Tax credit note No,Tax Invoice/Tax credit note Date,Tax Invoice/Tax credit note Amount AED (before VAT),Reporting period from,Reporting period to,Supplier Name,Location of the Supplier,Name of the Customs Authority,Customs Declaration Number,Clear description of the transaction,VAT Amount AED
+02 Credit Note,111111111111111,ABC LTD.,IN20012191,9/20/2024,"-9,115.68",9/1/2024,9/30/2024,AM DSTC FZE,UAE,‌DXB,‌1020752636124,Import of goods to designated Free Zone.,-455.78
+02 Credit Note,111111111111111,ABC LTD.,IN20012220,9/25/2024,"-17,719.30",9/1/2024,9/30/2024,AM DSTC FZE,UAE,‌DXB,‌1020753214224,Import of goods to designated Free Zone.,-885.96

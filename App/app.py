@@ -29,10 +29,9 @@ class Query(BaseModel):
 @app.post('/query')
 async def returnResults(q: Query):
 
-    
     query = q.query
 
-    topChunks, topMetas, topIds, originalText = retrieve_relevant_chunks(query=query)
+    topChunks, topMetas, topIds, originalText, query, arithmeticResult = retrieve_relevant_chunks(query=query)
 
     formatted_meta = f"""
                     Our company name: {topMetas[0]['company_name']}
@@ -42,6 +41,7 @@ async def returnResults(q: Query):
         - Raw: {m['raw']}
         - Format: {m['format']}
         - Type of Transaction: {m['prefix']}
+        - Arithmetic Result: {arithmeticResult if arithmeticResult else "This query might not require an arithmetic result."}
         """ for m in topMetas])
 
     print(formatted_meta)
@@ -70,6 +70,6 @@ async def returnResults(q: Query):
 
 
 if __name__ == "__main__":
-    chunks, metas, ids, originalText = retrieve_relevant_chunks("what is the location of customer bauh")
+    chunks, metas, ids, originalText, query = retrieve_relevant_chunks("what is the location of customer bauh")
     meta = metas[0]
     print(meta['invoice_no'])

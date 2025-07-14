@@ -1,0 +1,7 @@
+Transaction Type,Taxpayer TRN,Company Name / Member Company Name (If applicable),Tax Invoice/Tax credit note No,Tax Invoice/Tax credit note Date,Tax Invoice/Tax credit note Amount AED (before VAT),Reporting period from,Reporting period to,Supplier Name,Location of the Supplier,Name of the Customs Authority,Customs Declaration Number,Clear description of the transaction,VAT Amount AED
+02 Credit Note,111111111111111,ABC LTD.,ES0628/24,8/5/2024,"-69,883.92",8/1/2024,8/31/2024,IBIX,ITALY,DXB,"1,012,510,354,424.00",Import of Goods to DFZ.,"-3,494.20"
+02 Credit Note,111111111111111,ABC LTD.,2400489,8/7/2024,"-74,764.01",8/1/2024,8/31/2024,SIAT,ITALY,AUH,"24,957,659.00",Import of Goods to DFZ.,"-3,738.20"
+02 Credit Note,111111111111111,ABC LTD.,90225917,8/19/2024,"-111,405.78",8/1/2024,8/31/2024,AL J,Oman,DXB,"1,040,138,798,724.00",Import of Goods to DFZ.,"-5,570.29"
+02 Credit Note,111111111111111,ABC LTD.,90225919,8/19/2024,"-111,405.78",8/1/2024,8/31/2024,AL J,Oman,DXB,"1,040,138,846,024.00",Import of Goods to DFZ.,"-5,570.29"
+02 Credit Note,111111111111111,ABC LTD.,36297,8/20/2024,"-113,882.33",8/1/2024,8/31/2024,AL J,Oman,DXB,1040138860724,Import of Goods to DFZ.,"-5,694.12"
+02 Credit Note,111111111111111,ABC LTD.,202425BTSMISC12,8/14/2024,"-1,151.66",8/1/2024,8/31/2024,Bhot,India,DXB,1012520741024,Import of Goods to DFZ.,-57.58

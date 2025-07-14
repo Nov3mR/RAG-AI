@@ -1,0 +1,8 @@
+Transaction Type,Taxpayer TRN,Company Name / Member Company Name (If applicable),Tax Invoice/Tax credit note No,Tax Invoice/Tax credit note Date,Tax Invoice/Tax credit note Amount AED (before VAT),Reporting period from,Reporting period to,Supplier Name,Location of the Supplier,Name of the Customs Authority,Customs Declaration Number,Clear description of the transaction,VAT Amount AED
+01 Invoice,111111111111111,ABC LTD.,IN5H0000627,8/27/2024,"46,718.36",9/1/2024,9/30/2024,AM DSTC FZE,UAE,‌SHJ,‌1-1-55-1-24-79228,Transfer of goods within same VAT group entities.,"2,335.92"
+01 Invoice,111111111111111,ABC LTD.,PO50005689,9/14/2024,"32,550.05",9/1/2024,9/30/2024,AM DSTC FZE,UAE,‌SHJ,‌1-1-55-1-24-86046,Transfer of goods within same VAT group entities.,"1,627.50"
+01 Invoice,111111111111111,ABC LTD.,IN20012191,9/20/2024,"9,115.68",9/1/2024,9/30/2024,AM DSTC FZE,UAE,‌DXB,‌1020752636124,Import of goods to designated Free Zone.,455.78
+01 Invoice,111111111111111,ABC LTD.,IN20012220,9/25/2024,"17,719.30",9/1/2024,9/30/2024,AM DSTC FZE,UAE,‌DXB,‌1020753214224,Import of goods to designated Free Zone.,885.96
+01 Invoice,111111111111111,ABC LTD.,IN20012210,9/25/2024,"53,908.63",9/1/2024,9/30/2024,AM DSTC FZE,UAE,‌DXB,‌1020753978624,Transfer of goods within same VAT group entities.,"2,695.43"
+01 Invoice,111111111111111,ABC LTD.,IN20012152/IN20012157/IN20012159/IN20012181/IN20012186/IN20012223,9/30/2024,"243,531.46",9/1/2024,9/30/2024,AM DSTC FZE,UAE,‌DXB,‌1020755168524,Transfer of goods within same VAT group entities.,"12,176.57"
+01 Invoice,111111111111111,ABC LTD.,IN20012208/IN20012218,9/26/2024,"5,430,685.41",9/1/2024,9/30/2024,AM DSTC FZE,UAE,‌DXB,‌1020755229824,Transfer of goods within same VAT group entities.,"271,534.27"
