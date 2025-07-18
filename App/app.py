@@ -1,12 +1,11 @@
 import os
 import time
 from sentence_transformers import SentenceTransformer
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from promptLLM import call_LLM
-from buildQuery import returnQuery
-from getResults import retrieve_relevant_chunks 
+from getResults import *
+from newFileResults import *
 
 os.environ["HF_HUB_DISABLE_SSL_VERIFICATION"] = "1"
 
@@ -26,48 +25,51 @@ app.add_middleware(
 class Query(BaseModel):
     query: str
 
+app.state.userAddedFile = False
+app.state.fileName = ""
+
 @app.post('/query')
 async def returnResults(q: Query):
 
     query = q.query
 
-    topChunks, topMetas, topIds, originalText, query, arithmeticResult = retrieve_relevant_chunks(query=query)
-
-    formatted_meta = f"""
-                    Our company name: {topMetas[0]['company_name']}
-                    Our TRN: {topMetas[0]['trn']} """
-
-    formatted_meta = "\n".join([f"""- Invoice Number: {m['invoice_no']}
-        - Raw: {m['raw']}
-        - Format: {m['format']}
-        - Type of Transaction: {m['prefix']}
-        - Arithmetic Result: {arithmeticResult if arithmeticResult else "This query might not require an arithmetic result."}
-        """ for m in topMetas])
-
-    print(formatted_meta)
-
-    context = "\n\n".join(originalText)
-
-    prompt = returnQuery(context=context, meta=formatted_meta, query=query)
-
-    print("Calling LLM")
     startTime = time.time()
-    answer = call_LLM(prompt=prompt)   
+
+    if app.state.userAddedFile:
+        answer = query_new_collection(query_text=query, file_name=app.state.fileName)
+    else:
+        originalText, answer, prompt, topChunks, formatted_meta, topIds = getResult(query)
 
     endTime = time.time()
     totalTime = endTime - startTime
 
     print(f"Time elapsed: {totalTime}")
-    print(f"Raw: {originalText}")
+    # print(f"Raw: {originalText}")
 
     return {
         "answer": answer,
-        "prompt": prompt,
-        "chunks": topChunks,
-        "metadata": formatted_meta,
-        "ids": topIds
+        # "prompt": prompt,
+        # "chunks": topChunks,
+        # "metadata": formatted_meta,
+        # "ids": topIds
     }
 
+
+@app.post('/upload')
+async def upload_file(file: UploadFile = File(...)):
+    contents = await file.read()
+    result = add_file_to_db(contents, file.filename)
+    app.state.userAddedFile = True
+    app.state.fileName = file.filename
+
+    if result.get("status") == "partial_mapping":
+        print("Partial mapping occurred:")
+        return {
+            "status": "partial_mapping",
+            "unmapped": result["unmapped"]
+        }
+
+    return {"filename": app.state.fileName, "contents": contents.decode("utf-8"), "message": result["message"]}
 
 if __name__ == "__main__":
     chunks, metas, ids, originalText, query = retrieve_relevant_chunks("what is the location of customer bauh")

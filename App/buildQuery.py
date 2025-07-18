@@ -24,3 +24,29 @@ def returnQuery(context, meta, query):
     """ 
 
     return prompt
+
+def returnArithmeticQuery(context, meta, query, arithmetic):
+    prompt = f"""
+    You are a helpful AI assistant specialized in UAE VAT and tax invoices. You must keep in mind any previous context and questions.
+
+
+    This query is related to arithmetic calculations. The calculation has already been completed.
+
+    This is the result of the calculation: {arithmetic}
+
+    Below is data about the invoice this calculation was done on
+
+    Answer the query in a human-friendly format which includes the result of the calculation with minimal explanation.
+
+    ### INVOICE DATA
+    {context}
+
+    ### METADATA
+    {meta}
+
+    ### QUESTION
+    {query}
+
+    ### ANSWER
+    """
+    return prompt

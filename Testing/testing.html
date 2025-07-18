@@ -16,16 +16,14 @@
     label {
       font-weight: bold;
     }
-    textarea {
+    textarea, input[type="file"] {
       width: 100%;
-      height: 100px;
       margin-top: 0.5em;
       margin-bottom: 1em;
       padding: 0.5em;
       font-size: 1rem;
       border-radius: 4px;
       border: 1px solid #ccc;
-      resize: vertical;
     }
     button {
       padding: 0.5em 1em;
@@ -35,6 +33,7 @@
       background-color: #007bff;
       color: white;
       cursor: pointer;
+      margin-right: 0.5em;
     }
     button:disabled {
       background-color: #888;
@@ -51,25 +50,39 @@
 </head>
 <body>
 
-  <h1>Test /query API</h1>
+  <h1>Test /query and /upload APIs</h1>
 
-  <label for="queryInput">Enter your query:</label><br />
-  <textarea id="queryInput" placeholder="Type your query here..."></textarea><br />
-
+  <label for="queryInput">Enter your query:</label>
+  <textarea id="queryInput" placeholder="Type your query here..."></textarea>
   <button id="sendBtn" type="button">Send Query</button>
+
+  <hr />
+
+  <label for="fileInput">Upload a new file:</label>
+  <input type="file" id="fileInput" />
+  <button id="uploadBtn" type="button">Upload File</button>
 
   <h2>Response:</h2>
   <pre id="responseOutput">No response yet.</pre>
+  
+  <div id="mappingContainer" style="display: none; margin-top: 1em;">
+  <h3>Column Mapping</h3>
+  <form id="mappingForm">
+    <div id="mappingFields"></div>
+    <button type="submit">Submit Final Mapping</button>
+  </form>
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const sendBtn = document.getElementById('sendBtn');
+      const uploadBtn = document.getElementById('uploadBtn');
       const queryInput = document.getElementById('queryInput');
+      const fileInput = document.getElementById('fileInput');
       const responseOutput = document.getElementById('responseOutput');
 
       sendBtn.addEventListener('click', async (event) => {
-        event.preventDefault();  // <- semicolon added here
-
+        event.preventDefault();
         const query = queryInput.value.trim();
         if (!query) {
           alert('Please enter a query');
@@ -93,10 +106,10 @@
             responseOutput.textContent = `Error: ${response.status} ${response.statusText}\n${errorText}`;
           } else {
             const data = await response.json();
-            responseOutput.innerText =  `Answer: ${data.answer} \n\n
-            Prompt: ${data.prompt}\n\n
-            Metadata: ${JSON.stringify(data.metadata, null, 2)}
-            Chunks: ${data.chunks.join(", ")}`;
+            responseOutput.innerText =  `Answer: ${data.answer || "No answer found"} \n\n
+Prompt: ${data.prompt || "No prompt found"}\n\n
+Metadata: ${data.metadata ? JSON.stringify(data.metadata, null, 2) : "No metadata found"}\n\n
+Chunks: ${data.chunks ? data.chunks.join(", ")  : "No chunks found"}`;
           }
         } catch (err) {
           responseOutput.textContent = 'Fetch error: ' + err.message;
@@ -104,7 +117,107 @@
           sendBtn.disabled = false;
         }
       });
+
+    uploadBtn.addEventListener('click', async (event) => {
+    event.preventDefault();
+    const file = fileInput.files[0];
+    if (!file) {
+      alert('Please select a file to upload.');
+      return;
+    }
+
+    uploadBtn.disabled = true;
+    responseOutput.textContent = 'Uploading file...';
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('http://127.0.0.1:8000/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.status === "partial_mapping") {
+        responseOutput.textContent = "Some columns couldn't be mapped. Please review below.";
+        document.getElementById("mappingContainer").style.display = "block";
+
+        const fieldsDiv = document.getElementById("mappingFields");
+        fieldsDiv.innerHTML = ""; // Clear previous
+
+        Object.entries(data.mapping).forEach(([src, dst]) => {
+          fieldsDiv.innerHTML += `
+            <label>${src}</label>
+            <input type="text" name="${src}" value="${dst}" /><br/>
+          `;
+        });
+
+        data.unmapped.forEach(col => {
+          const suggestion = data.suggestions[col] || "";
+          fieldsDiv.innerHTML += `
+            <label>${col} (unmapped)</label>
+            <input type="text" name="${col}" value="${suggestion}" /><br/>
+          `;
+        });
+
+        // Save contents and filename for later
+        window.uploadedFileContents = data.contents;
+        window.uploadedFileName = data.filename;
+
+      } else {
+        responseOutput.textContent = `File uploaded successfully.\n\nResponse: ${JSON.stringify(data, null, 2)}`;
+      }
+
+    } catch (err) {
+      responseOutput.textContent = 'Upload error: ' + err.message;
+    } finally {
+      uploadBtn.disabled = false;
+    }
+  });
+
+    document.getElementById("mappingForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    const mapping = {};
+    for (const [key, value] of formData.entries()) {
+      if (value) mapping[key] = value;
+    }
+
+    const payload = {
+      filename: window.uploadedFileName,
+      contents: window.uploadedFileContents,
+      mapping: mapping
+    };
+
+    responseOutput.textContent = "Submitting final mapping...";
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/finalize-mapping", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+      responseOutput.textContent = `Final mapping submitted.\n\n${JSON.stringify(data, null, 2)}`;
+
+      document.getElementById("mappingContainer").style.display = "none";
+    } catch (err) {
+      responseOutput.textContent = "Finalization error: " + err.message;
+    }
     });
+
+
+
+
+  });
   </script>
 
 </body>

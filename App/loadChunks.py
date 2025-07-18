@@ -67,12 +67,10 @@ def load_all_data():
                 print(f"Skipping unknown format: {file}")
             else:
                 month = Path(path).parent.name
-                if month == "May": # remove if condition for all months
-                    df = load_format_a(df)
-                    vat_dfs.append((file, df, format, month))   
-                else:
-                    pass
-
+                # add if condition for specific months
+                df = load_format_a(df)
+                vat_dfs.append((file, df, format, month))   
+               
     return vat_dfs, aging_dfs
 
 # def row_to_chunk_json_with_invoice(row):
@@ -177,6 +175,8 @@ def extract_metadata_from_row(row, format):
                 value = str(row[col]).strip()
                 if value == "-":
                     value = "0"
+                else:
+                    value = re.sub(r'(?<=\d),(?=\d)', '', value)
                 break
         result[var] = value
 
@@ -230,8 +230,7 @@ def df_to_chunks(df, prefix=None, filename=None, format=None, month=None):
 
         # VAT Adjustment normalization
 
-        if vatAdjustments == "-":
-            vatAdjustments = "0"
+       
 
         chunk, tType, company_trn, company_name = row_to_chunk(row=row)
         chunk = chunk.replace("\n", " ").replace("  ", " ")
@@ -242,27 +241,27 @@ def df_to_chunks(df, prefix=None, filename=None, format=None, month=None):
             "chunk": chunk,
             "source_file": filename or prefix or "unknown",
             "format": format if format else "unknown",
-            "prefix": prefix if prefix else tType,
-            "company_trn": company_trn if company_trn else "Aging Report - No TRN",
-            "company_name": company_name if company_name else "Aging Report - No Company Name",
-            "name": name,
-            "voucher_no": voucherNo,
-            "invoice_no": invoiceNo,
-            "invoice_date": invoiceDate,
-            "due_date": dueDate,
-            "total_invoice_amount": totalInvoiceAmount,
-            "vat_amount": vatAmount,
-            "amount_paid": amountPaid,
-            "amount_pending": amountPending,
-            "days_due": str(daysDue),
-            "date_received": dateReceived,
-            "trn": trn,
-            "location": location,
-            "customs_auth": customsAuth,
-            "customs_number": str(customsNumber),
-            "vat_recovered": vatRecovered,
-            "vat_adjustments": vatAdjustments,
-            "month": month if month else "SAR"
+            "prefix": prefix.lower() if prefix else tType.lower(),
+            "company_trn": company_trn.lower() if company_trn else "Aging Report - No TRN",
+            "company_name": company_name.lower() if company_name else "Aging Report - No Company Name",
+            "name": name.lower(),
+            "voucher_no": voucherNo.lower(),
+            "invoice_no": invoiceNo.lower(),
+            "invoice_date": invoiceDate.lower(),
+            "due_date": dueDate.lower(),
+            "total_invoice_amount": totalInvoiceAmount.lower(),
+            "vat_amount": vatAmount.lower(),
+            "amount_paid": amountPaid.lower(),
+            "amount_pending": amountPending.lower(),
+            "days_due": str(daysDue).lower(),
+            "date_received": dateReceived.lower(),
+            "trn": trn.lower(),
+            "location": location.lower(),
+            "customs_auth": customsAuth.lower(),
+            "customs_number": str(customsNumber).lower(),
+            "vat_recovered": vatRecovered.lower(),
+            "vat_adjustments": vatAdjustments.lower(),
+            "month": month.lower() if month else "sar"
         })
 
     # if format == "SAR":
@@ -284,7 +283,6 @@ def create_chunks():
         agingChunks, agingMetas = df_to_chunks(df, prefix="Aging Report", format=format)
         allChunks.extend(agingChunks)
         allMetadatas.extend(agingMetas)
-
 
     return allChunks, allMetadatas
 
