@@ -1,47 +1,6 @@
-# Byte-compiled / cache files
-__pycache__/
-*.py[cod]
-
-# Virtual environment
 venv/
-env/
-
-# IDEs and editors
-.vscode/
-.idea/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# SQLite / Chroma
-*.sqlite3
-*.db
-
-# Models / binaries
-*.onnx
-*.pt
-*.pth
 *.dylib
 *.so
 *.bin
-*.ckpt
-
-# Chroma DB storage
-App/chromaStore/
-
-# Jupyter
-.ipynb_checkpoints/
-
-# FastAPI auto-generated OpenAPI files
-openapi.json
-
-# Parquet/cache
-*.parquet
-
-# Export files
-*.csv
-*.tsv
+*.pkl
+*.log
