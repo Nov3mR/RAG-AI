@@ -241,7 +241,7 @@ def df_to_chunks(df, prefix=None, filename=None, format=None, month=None):
             "chunk": chunk,
             "source_file": filename or prefix or "unknown",
             "format": format if format else "unknown",
-            "prefix": prefix.lower() if prefix else tType.lower(),
+            "prefix": prefix.lower() if prefix is not None else (tType.lower() if tType is not None else "unknown"),
             "company_trn": company_trn.lower() if company_trn else "Aging Report - No TRN",
             "company_name": company_name.lower() if company_name else "Aging Report - No Company Name",
             "name": name.lower(),

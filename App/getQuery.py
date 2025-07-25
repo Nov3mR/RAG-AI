@@ -41,7 +41,11 @@ def returnArithmeticData(query: str) -> dict:
 
     json_str = re.sub(r",\s*(\}|\])", r"\1", response)
 
-    return json_str
+    try:
+        return json.loads(json_str)
+    except json.JSONDecodeError:
+        print("Error decoding JSON response")
+        return {}
 
 if __name__ == "__main__":
 

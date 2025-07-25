@@ -182,7 +182,7 @@ def find_query_format(query_text):
     similarities = util.cos_sim(query_embedding, example_embeddings)[0]
 
     scored = list(zip(example_labels, similarities))
-    scored.sort(key=lambda x: x[1], reverse=True)
+    scored.sort(key=lambda x: float(x[1]), reverse=True)
     seen = set()
     scores = []
 
@@ -432,9 +432,13 @@ def query_chroma(collection, query_text, original_query, n_results, json_query):
     print(formats)
     return results, raw
 
-def perform_arithmetic_from_llm(df: pd.DataFrame, llm_json: str):
+from typing import Union
+
+def perform_arithmetic_from_llm(df: pd.DataFrame, llm_json: Union[str, dict]):
 
     query_json = llm_json
+    if isinstance(query_json, str):
+        query_json = json.loads(query_json)
     operation = query_json["operation"]
     field = query_json["field"]
     filters = query_json.get("filters", {})
@@ -574,7 +578,9 @@ def retrieve_relevant_chunks(query, top_k=5):
         arithmeticData = returnArithmeticData(query=query)
 
         try:
-            arithmeticData = json.loads(arithmeticData.strip())
+            if isinstance(arithmeticData, str):
+                arithmeticData = json.loads(arithmeticData.strip())
+            # If it's already a dict, do nothing
         except json.JSONDecodeError:
             print("Invalid JSON received from LLM:", arithmeticData)
             arithmeticData = {}

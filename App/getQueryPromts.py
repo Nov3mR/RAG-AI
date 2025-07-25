@@ -16,7 +16,7 @@ arithmeticColNames = """
     """
 
 
-def getJsonPrompt(query: str) -> dict:
+def getJsonPrompt(query: str) -> str:
    
     # jsonPrompt = f"""
     # Extract structured info from the following user query:
@@ -170,7 +170,7 @@ def getNewPrompt(query: str) -> str:
     """
     return newPrompt.strip()
 
-def getArithmeticPrompt(query: str) -> dict:
+def getArithmeticPrompt(query: str) -> str:
     arithmeticPrompt = f"""
 
     You are an intelligent assistant helping identify if a user's query requires performing arithmetic operations (like sum, average, count, min, or max) on tabular data.

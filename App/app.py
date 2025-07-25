@@ -71,7 +71,3 @@ async def upload_file(file: UploadFile = File(...)):
 
     return {"filename": app.state.fileName, "contents": contents.decode("utf-8"), "message": result["message"]}
 
-if __name__ == "__main__":
-    chunks, metas, ids, originalText, query = retrieve_relevant_chunks("what is the location of customer bauh")
-    meta = metas[0]
-    print(meta['invoice_no'])

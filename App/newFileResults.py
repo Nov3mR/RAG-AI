@@ -9,7 +9,7 @@ from promptLLM import call_LLM
 from buildQuery import returnQuery
 from fuzzywuzzy import process, fuzz
 
-def new_df_to_chunks(df, filename=None, mapping=None):
+def new_df_to_chunks(df, filename=None):
     documents = []
     metadatas = []
     ids = []
@@ -80,7 +80,7 @@ def fuzzy_map_columns(cols, fields):
     return mapping, unmapped, suggestions
 
 def add_file_to_db(contents, fileName):
-    df  = pd.read_csv(BytesIO(contents), encoding='utf-8', on_bad_lines='skip') if fileName.endswith('.csv') else pd.read_excel(BytesIO(contents), engine='openpyxl', on_bad_lines='skip')
+    df  = pd.read_csv(BytesIO(contents), encoding='utf-8', on_bad_lines='skip') if fileName.endswith('.csv') else pd.read_excel(BytesIO(contents), engine='openpyxl')
     
     df_columns = df.columns.tolist()
     db_fields = ["name", "voucher_no", "invoice_no", "invoice_date", "due_date", "total_invoice_amount", "vat_amount", "amount_paid", "amount_pending", "days_due", "date_received", "trn", "location", "customs_auth", "customs_number", "vat_recovered", "vat_adjustments"]
@@ -91,7 +91,7 @@ def add_file_to_db(contents, fileName):
 
     embedding_fn = SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
 
-    # mapping = map_columns(df_columns, db_fields)
+    mapping = map_columns(df_columns, db_fields)
     fuzzy_mapping, unmapped, suggestions = fuzzy_map_columns(df_columns, db_fields)
 
     print(fuzzy_mapping, unmapped, suggestions)
@@ -106,11 +106,11 @@ def add_file_to_db(contents, fileName):
             "unmapped": unmapped
         }
 
-    new_documents, new_metadatas, new_ids = new_df_to_chunks(df=df, filename=fileName, mapping=fuzzy_mapping)
+    new_documents, new_metadatas, new_ids = new_df_to_chunks(df=df, filename=fileName)
     collection_name = fileName.replace(".", "_")
 
     client = chromadb.Client()
-    collection = client.get_or_create_collection(name=collection_name, embedding_function=embedding_fn)
+    collection = client.get_or_create_collection(name=collection_name)
 
     for doc, meta, doc_id in zip(new_documents, new_metadatas, new_ids):
         collection.add(
@@ -136,9 +136,16 @@ def query_new_collection(query_text, file_name):
 
     print(results["documents"])
 
+    documents = results.get("documents")
+    metadatas = results.get("metadatas")
+    if documents and len(documents) > 0 and documents[0]:
+        context_text = "\n\n".join(documents[0])
+    else:
+        context_text = "No relevant documents found."
+
     prompt = returnQuery(
-        context="\n\n".join(results["documents"][0]),
-        meta=results["metadatas"],
+        context=context_text,
+        meta=metadatas,
         query=query_text
     )
     answer = call_LLM(prompt=prompt)
