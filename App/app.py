@@ -4,8 +4,10 @@ from sentence_transformers import SentenceTransformer
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Literal
 from getResults import *
 from newFileResults import *
+from getLLMAnswer import *
 
 os.environ["HF_HUB_DISABLE_SSL_VERIFICATION"] = "1"
 
@@ -22,11 +24,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class Query(BaseModel):
-    query: str
-
 app.state.userAddedFile = False
 app.state.fileName = ""
+app.state.contents = b""
+
+class Query(BaseModel):
+    query: str
+    mode: Literal["file_only", "db_only", "both"] = "both" if app.state.userAddedFile else "db_only"
 
 @app.post('/query')
 async def returnResults(q: Query):
@@ -35,10 +39,15 @@ async def returnResults(q: Query):
 
     startTime = time.time()
 
-    if app.state.userAddedFile:
-        answer = query_new_collection(query_text=query, file_name=app.state.fileName)
-    else:
-        originalText, answer, prompt, topChunks, formatted_meta, topIds = getResult(query)
+    context, meta, arithmeticResult, arithmeticRow, newContext, newMeta = None, None, None, None, None, None
+
+    if app.state.userAddedFile and q.mode in ["both", "file_only"]:
+        newContext, newMeta = query_new_collection(query_text=query, file_name=app.state.fileName, mode=q.mode)
+
+    if q.mode in ["db_only", "both"]:
+        context, meta, arithmeticResult, arithmeticRow = getResult(query)
+
+    answer = returnLLMAnswer(query=query, context=context if context else newContext, meta=meta if meta else newMeta, arithmeticResult=arithmeticResult, arithmeticRow=arithmeticRow, newContext=newContext if context else None, newMeta=newMeta if meta else None)
 
     endTime = time.time()
     totalTime = endTime - startTime
@@ -57,8 +66,8 @@ async def returnResults(q: Query):
 
 @app.post('/upload')
 async def upload_file(file: UploadFile = File(...)):
-    contents = await file.read()
-    result = add_file_to_db(contents, file.filename)
+    app.state.contents = await file.read()
+    result = add_file_to_db(app.state.contents, file.filename)
     app.state.userAddedFile = True
     app.state.fileName = file.filename
 
@@ -66,8 +75,37 @@ async def upload_file(file: UploadFile = File(...)):
         print("Partial mapping occurred:")
         return {
             "status": "partial_mapping",
-            "unmapped": result["unmapped"]
+            "unmapped": result["unmapped"],
+            "mapping": result["mapping"],
+            "suggestions": result["suggestions"],
+            "fields_left": result["fields_left"],
+            "fieldDisplayNames": result.get("fieldDisplayNames", {}),
+            "contents": app.state.contents,
+            "filename": app.state.fileName
         }
 
-    return {"filename": app.state.fileName, "contents": contents.decode("utf-8"), "message": result["message"]}
+    return {"filename": app.state.fileName, "contents": app.state.contents.decode("utf-8"), "message": result["message"]}
 
+@app.post('/finalize-mapping')
+async def finalize_mapping(payload: dict):
+    # Here you would finalize the mapping in your database or processing pipeline
+    print("Finalizing mapping:")
+    print(payload["mapping"])
+    result = add_file_to_db(app.state.contents, app.state.fileName, fullMapping=payload["mapping"])
+    app.state.userAddedFile = True
+
+    if result.get("status") == "success":
+        print("Mapping finalized successfully.")
+        return {"status": "success", "message": f"Mapping finalized. {app.state.fileName} added to database."}
+    else:
+        print("Error finalizing mapping.")
+        return {
+            "status": "partial_mapping",
+            "message": "Error finalizing mapping.",
+            "unmapped": result["unmapped"],
+            "mapping": result["mapping"],
+            "suggestions": result["suggestions"],
+            "fields_left": result["fields_left"],
+            "contents": app.state.contents,
+            "filename": app.state.fileName
+            }

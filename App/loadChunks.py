@@ -145,8 +145,37 @@ def row_to_chunk(row):
     return chunk, prefix, trn, company_name
 
 
-def extract_metadata_from_row(row, format):
+def extract_metadata_from_row(row, aliases=None):
 
+    result = {}
+    if isinstance(aliases, dict):
+        for var, possible_cols in aliases.items():
+        
+            value = "N/A"
+            for col in possible_cols:
+                if col in row and pd.notnull(row[col]):
+                    value = str(row[col]).strip()
+                    if value == "-":
+                        value = "0"
+                    else:
+                        value = re.sub(r'(?<=\d),(?=\d)', '', value)
+                    break
+            result[var] = value
+
+    return result
+
+def df_to_chunks(df, prefix=None, filename=None, format=None, month=None):
+    chunks = []
+    metadatas = []
+    #add date, amount, vat amount, name, location, received date/vatRecovered/adjustments (Box 9), customsAuth/Number (6/7) 
+    #for later, description, OOS
+
+    """
+    Supplier Aging Report: Supplier Name, Voucher No, Invoice No, Invoice Date, Due Date, Total Invoice Amount (AED), VAT Amount (AED), Amount Paid (AED), Pending Amount (AED), Upto 30 Days Due, 30-60 Days Due, 61-90 Days Due, More than 90 Days Due, Pending >180 Days, Total days due from due date as on 16 May 2025
+    VAT Sheets: Transaction Type, Taxpayer TRN, Company Name, Tax Invoice/Credit Note Date, Tax Invoice/Credit Note Received Date, Clear description of the supply, Clear description of the transaction, Customer Name, Supplier Name, Customer TRN, Supplier TRN, Location of the Supplier, Location of the Customer, Customs Declaration Number, VAT Amount Recovered AED, VAT adjustments, Reason of Out-of-Scope Sales treatment, Month
+
+    """
+    #ADD DESCRIPTION AND OOS LATER
     aliases = {
     "name": ["Supplier Name", "Customer Name"],
     "voucherNo": ["Voucher No"],
@@ -167,37 +196,10 @@ def extract_metadata_from_row(row, format):
     "vatAdjustments": ["VAT adjustments"]
     }
 
-    result = {}
-    for var, possible_cols in aliases.items():
-        value = "N/A"
-        for col in possible_cols:
-            if col in row and pd.notnull(row[col]):
-                value = str(row[col]).strip()
-                if value == "-":
-                    value = "0"
-                else:
-                    value = re.sub(r'(?<=\d),(?=\d)', '', value)
-                break
-        result[var] = value
-
-    return result
-
-def df_to_chunks(df, prefix=None, filename=None, format=None, month=None):
-    chunks = []
-    metadatas = []
-    #add date, amount, vat amount, name, location, received date/vatRecovered/adjustments (Box 9), customsAuth/Number (6/7) 
-    #for later, description, OOS
-
-    """
-    Supplier Aging Report: Supplier Name, Voucher No, Invoice No, Invoice Date, Due Date, Total Invoice Amount (AED), VAT Amount (AED), Amount Paid (AED), Pending Amount (AED), Upto 30 Days Due, 30-60 Days Due, 61-90 Days Due, More than 90 Days Due, Pending >180 Days, Total days due from due date as on 16 May 2025
-    VAT Sheets: Transaction Type, Taxpayer TRN, Company Name, Tax Invoice/Credit Note Date, Tax Invoice/Credit Note Received Date, Clear description of the supply, Clear description of the transaction, Customer Name, Supplier Name, Customer TRN, Supplier TRN, Location of the Supplier, Location of the Customer, Customs Declaration Number, VAT Amount Recovered AED, VAT adjustments, Reason of Out-of-Scope Sales treatment, Month
-
-    """
-    #ADD DESCRIPTION AND OOS LATER
-
     for _, row in df.iterrows():
 
-        values = extract_metadata_from_row(row=row, format=format)
+
+        values = extract_metadata_from_row(row=row, aliases=aliases)
 
         name = values["name"]
         voucherNo = values["voucherNo"]
@@ -216,6 +218,7 @@ def df_to_chunks(df, prefix=None, filename=None, format=None, month=None):
         customsNumber = values["customsNumber"]
         vatRecovered = values["vatRecovered"]
         vatAdjustments = values["vatAdjustments"]
+        other = "N/A"
 
         # TRN normalization
 
@@ -261,12 +264,9 @@ def df_to_chunks(df, prefix=None, filename=None, format=None, month=None):
             "customs_number": str(customsNumber).lower(),
             "vat_recovered": vatRecovered.lower(),
             "vat_adjustments": vatAdjustments.lower(),
-            "month": month.lower() if month else "sar"
+            "month": month.lower() if month else "sar",
+            "other": other.lower()
         })
-
-    # if format == "SAR":
-    #     for meta in metadatas:
-    #         print(meta["amount_pending"])
 
     return chunks, metadatas
 

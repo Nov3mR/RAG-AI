@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from typing import Union
 import sys
 import pandas as pd
 import re
@@ -65,6 +66,7 @@ def loadOrCreateEmbeddings():
             "vat_recovered": [meta["vat_recovered"] for meta in metas],
             "vat_adjustments": [meta["vat_adjustments"] for meta in metas],
             "month": [meta["month"] for meta in metas],
+            "other": [meta["other"] for meta in metas],
             "raw": [meta["chunk"] for meta in metas],
             "id": [f"chunk_{i}" for i in range(len(chunks))]
             # "company_name": metas["company_name"][0] if "company_name" in metas else None,  # Assuming all chunks have the same company name
@@ -84,7 +86,7 @@ def chromaDBSetup(df, batch_size=5000):
 
     documents = df["chunk"].astype(str).tolist()
     embeddings = df["embedding"].tolist()
-    metadatas = df[["source_file", "format", "prefix", "company_trn", "company_name", "name", "voucher_no", "invoice_no", "invoice_date", "due_date", "total_invoice_amount", "vat_amount", "amount_paid", "amount_pending", "days_due", "date_received", "trn", "location", "customs_auth", "customs_number", "vat_recovered", "vat_adjustments", "month", "raw"]].to_dict(orient="records")
+    metadatas = df[["source_file", "format", "prefix", "company_trn", "company_name", "name", "voucher_no", "invoice_no", "invoice_date", "due_date", "total_invoice_amount", "vat_amount", "amount_paid", "amount_pending", "days_due", "date_received", "trn", "location", "customs_auth", "customs_number", "vat_recovered", "vat_adjustments", "month", "raw", "other"]].to_dict(orient="records")
     ids = df["id"].tolist()
 
     collection = client.get_or_create_collection(name="vat_chunks")
@@ -325,7 +327,7 @@ def query_by_format_priority(collection, query_text, embedded_query, format_prio
 
     return results, raw
 
-def query_chroma(collection, query_text, original_query, n_results, json_query):
+def query_chroma(collection, query_text, original_query, n_results, json_query, format=None):
     query_text = query_text.lower()
     original_query = original_query.lower()
 
@@ -335,10 +337,14 @@ def query_chroma(collection, query_text, original_query, n_results, json_query):
     
     embedded_query = model.encode([query_text]).tolist()
 
-    formats = find_query_format(query_text)
-    allFormats = ["SAR", "Box 1", "Box 3", "Box 4", "Box 6/7", "Box 9", "OOS"]
+    if format == "New":
+        formats = ["New"]
+        allFormats = ["New"]
+    else:
+        formats = find_query_format(query_text)
+        allFormats = ["SAR", "Box 1", "Box 3", "Box 4", "Box 6/7", "Box 9", "OOS"]
 
-    allMonths = ["may", "june", "july", "august", "september", "sar"]
+    allMonths = ["may", "june", "july", "august", "september", "sar", "other"]
     months = []
     if json_query != "":
         for col, data in json_query.items():
@@ -431,8 +437,6 @@ def query_chroma(collection, query_text, original_query, n_results, json_query):
 
     print(formats)
     return results, raw
-
-from typing import Union
 
 def perform_arithmetic_from_llm(df: pd.DataFrame, llm_json: Union[str, dict]):
 
@@ -644,6 +648,7 @@ def getResult(query, newFile=None):
             - Type of Transaction: {m['prefix']}""" for m in topMetas])
 
     formatted_meta = company_info + "\n" + formatted_meta
+
     meta = formatted_meta + "\n" + invoice_info
 
     context = "\n\n".join(originalText)
@@ -652,29 +657,9 @@ def getResult(query, newFile=None):
     #     newFileResults = ""
     #     context += f"\n\n {newFileResults["documents"][0]}"
 
-    prompt = ""
-
     print(arithmeticResult, arithmeticRow)
 
-    if arithmeticResult and isinstance(arithmeticResult, float) and (arithmeticRow == "" or arithmeticRow is None):
-        answer = f"The result is: {arithmeticResult:,.2f}"
-    elif arithmeticResult and (arithmeticRow == "" or arithmeticRow is None):
-        answer = f"The result is: {arithmeticResult}"
-    elif arithmeticRow != "" and arithmeticRow is not None:
-        context = "\n".join(arithmeticRow.split())
-        meta = formatted_meta
-        query = query
-        prompt = returnArithmeticQuery(context=context, meta=meta, query=query, arithmetic=arithmeticResult)
-        print("Calling LLM for Arithmetic Prompt")
-        answer = f"The result is: {arithmeticResult}"
-        llmAnswer = call_LLM(prompt=prompt)
-        answer += f"\n{llmAnswer}"
-    else:
-        prompt = returnQuery(context=context, meta=meta, query=query)
-        print("Calling LLM")
-        answer = call_LLM(prompt=prompt)
-
-    return originalText, answer, prompt, topChunks, formatted_meta, topIds
+    return context, meta, arithmeticResult, arithmeticRow
 
 
 if __name__ == "__main__":
