@@ -556,22 +556,22 @@ def retrieve_relevant_chunks(query, top_k=5):
 
     jsonQuery, newQuery, parsed, searchQuery = "", "", "", ""
 
-    jsonQuery, newQuery = returnNewQuery(query=query)
+    # jsonQuery, newQuery = returnNewQuery(query=query)
 
-    try:
-        match = re.search(r"\{.*?\}", jsonQuery, re.DOTALL)
-        if not match:
-            raise ValueError("No JSON object found in response")
+    # try:
+    #     match = re.search(r"\{.*?\}", jsonQuery, re.DOTALL)
+    #     if not match:
+    #         raise ValueError("No JSON object found in response")
 
-        jsonQuery = match.group(0)
-        parsed = json.loads(jsonQuery)  
+    #     jsonQuery = match.group(0)
+    #     parsed = json.loads(jsonQuery)  
     
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON: {e}")
+    # except json.JSONDecodeError as e:
+    #     raise ValueError(f"Invalid JSON: {e}")
 
-    searchQuery = " | ".join(f"{k}: {v}" for k, v in parsed.items() if k != "query" and v is not None and v not in ["", "null"] and str(v).strip() != "")
+    # searchQuery = " | ".join(f"{k}: {v}" for k, v in parsed.items() if k != "query" and v is not None and v not in ["", "null"] and str(v).strip() != "")
 
-    print(searchQuery)
+    # print(searchQuery)
 
     results, raw = query_chroma(collection, searchQuery.lower() if searchQuery != "" else query.lower(), original_query=query.lower(), n_results=top_k, json_query=parsed) # searchQuery.lower() if searchQuery != "" else newQuery
     
@@ -652,10 +652,6 @@ def getResult(query, newFile=None):
     meta = formatted_meta + "\n" + invoice_info
 
     context = "\n\n".join(originalText)
-
-    # if newFile:
-    #     newFileResults = ""
-    #     context += f"\n\n {newFileResults["documents"][0]}"
 
     print(arithmeticResult, arithmeticRow)
 
