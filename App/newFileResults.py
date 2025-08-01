@@ -15,6 +15,36 @@ from buildQuery import returnQuery
 from fuzzywuzzy import process, fuzz
 from getResults import *
 from getQuery import *
+import json
+import re
+
+def extract_json_from_llm_response(response: str):
+    """
+    Strips markdown formatting like ```json ... ``` and returns parsed JSON.
+    Handles both single and multiple JSON blocks.
+    """
+    # Extract content between ```json and ```
+    matches = re.findall(r"```json(.*?)```", response, re.DOTALL)
+
+    if not matches:
+        # fallback: maybe no code block wrapper
+        matches = [response.strip()]
+
+    result = []
+    for match in matches:
+        try:
+            # clean whitespace and parse JSON
+            parsed = json.loads(match.strip())
+            if isinstance(parsed, list):
+                result.extend(parsed)
+            else:
+                result.append(parsed)
+        except json.JSONDecodeError as e:
+            print(f"Failed to decode: {match[:100]}...")  # optional debug
+            raise e
+    return result
+
+
 
 
 def extract_text_from_pdf(contents):
@@ -39,29 +69,35 @@ def extract_text_from_image(contents):
     return pytesseract.image_to_string(image).strip()
 
 
-def extract_structured_row(line):
+def extract_structured_row(lines, fields, fileType):
     prompt = f"""Extract invoice data fields from the following line of text:
 
-    "{line}"
+    {" | ".join(lines)}
+
+    This text was extracted from a {fileType} file.
+
+    These are the fields you can use: {" , ".join(fields or [])}
 
     Return a JSON object like:
     {{
-    "invoice_no": "...",
-    "invoice_date": "...",
-    "total_invoice_amount": "...",
-    "vat_amount": "...",
-    ...
+    "invoice_no": "INV1001",
+    "invoice_date": "14-11-2023",
+    "total_invoice_amount": "1000.00",
+    "vat_amount": "100.00"
     }}
 
-Only return valid JSON. Omit fields if not present."""
-    
-    response = call_LLM(prompt)
+
+    Only return valid JSON. If field is not present, set it to "N/A". Any text that is not a field should be added to the "other" field."""
+
+    print("Calling LLM for structured row extraction")
+    print(prompt)
+    response = call_LLM(prompt, mode="openai")
+    print("LLM Response:", response)
+    response = extract_json_from_llm_response(response)
+
     try:
-        match = re.search(r"\{.*\}", response, re.DOTALL)
-        if match:
-            return json.loads(match.group())
-        else:
-            return None
+        if isinstance(response, list):
+            return response
     except:
         return None
 
@@ -155,7 +191,7 @@ def new_df_to_chunks(df, filename=None, fullMapping=None):
             "customs_number": str(customsNumber).lower(),
             "vat_recovered": vatRecovered.lower(),
             "vat_adjustments": vatAdjustments.lower(),
-            "month": month.lower(),
+            "month": month.lower() if month.lower() != "n/a" else "other",
             "other": other.lower()
         })
 
@@ -218,52 +254,7 @@ def fuzzy_map_columns(cols, fields):
     return mapping, unmapped, suggestions, fields
 
 def add_file_to_db(contents, fileName, fullMapping=None, batch_size=500):
-    
-    file_ext = fileName.lower().split(".")[-1]
 
-    if file_ext in ['csv', 'xls', 'xlsx']:
-        df = pd.read_csv(BytesIO(contents), encoding='utf-8', on_bad_lines='skip') if file_ext == 'csv' else pd.read_excel(BytesIO(contents), engine='openpyxl')
-    
-    elif file_ext == 'pdf':
-        text = extract_text_from_pdf(contents)
-        if not text.strip():
-            print("Fallback to OCR for scanned PDF")
-            text = extract_text_from_scanned_pdf(contents)
-        lines = [line.strip() for line in text.split('\n') if line.strip()]
-
-        structured_data = []
-        for line in lines:
-            extracted = extract_structured_row(line)
-            if extracted:
-                structured_data.append(extracted)
-
-        if not structured_data:
-            raise ValueError("Could not extract any structured rows from text")
-
-        df = pd.DataFrame(structured_data)
-
-    elif file_ext in ['jpg', 'jpeg', 'png']:
-        text = extract_text_from_image(contents)
-        lines = [line.strip() for line in text.split('\n') if line.strip()]
-
-        structured_data = []
-        for line in lines:
-            extracted = extract_structured_row(line)
-            if extracted:
-                structured_data.append(extracted)
-
-        if not structured_data:
-            raise ValueError("Could not extract any structured rows from text")
-
-        df = pd.DataFrame(structured_data)
-
-    else:
-        raise ValueError("Unsupported file type")
-
-
-    df  = pd.read_csv(BytesIO(contents), encoding='utf-8', on_bad_lines='skip') if fileName.endswith('.csv') else pd.read_excel(BytesIO(contents), engine='openpyxl')
-    
-    df_columns = df.columns.tolist()
     displayNames = {
                 "name": "Customer Name",
                 "voucher_no": "Voucher Number",
@@ -285,12 +276,65 @@ def add_file_to_db(contents, fileName, fullMapping=None, batch_size=500):
                 "month": "Invoice Month",
                 "other": "Other / Unclassified",
               }
+    
+    db_fields = list(displayNames.keys())
+
+    file_ext = fileName.lower().split(".")[-1]
+
+    if file_ext in ['csv', 'xls', 'xlsx']:
+        df = pd.read_csv(BytesIO(contents), encoding='utf-8', on_bad_lines='skip') if file_ext == 'csv' else pd.read_excel(BytesIO(contents), engine='openpyxl')
+    
+    elif file_ext == 'pdf':
+        print("Processing PDF file")
+        text = extract_text_from_pdf(contents)
+        if not text.strip():
+            print("Fallback to OCR for scanned PDF")
+            text = extract_text_from_scanned_pdf(contents)
+        lines = [line.strip() for line in text.split('\n') if line.strip()]
+        print("Extracted text from PDF:", lines)  # Print first 1000 characters for debugging
+
+        # for line in lines:
+        #     extracted = extract_structured_row(line)
+        #     if extracted:
+        #         structured_data.append(extracted)
+
+        extracted = extract_structured_row(lines, db_fields, fileType="PDF")
+        
+
+        if not extracted:
+            raise ValueError("Could not extract any structured rows from text")
+
+        print("Structured data extracted from PDF:", extracted)  # Print for debugging
+
+        df = pd.DataFrame(extracted)
+
+    elif file_ext in ['jpg', 'jpeg', 'png']:
+        print("Processing image file")
+        text = extract_text_from_image(contents)
+        print("Extracted text from image:", text)  # Print first 1000 characters for debugging
+        lines = [line.strip() for line in text.split('\n') if line.strip()]
+
+
+        # for line in lines:
+        #     extracted = extract_structured_row(line)
+        #     if extracted:
+        #         structured_data.append(extracted)
+        extracted = extract_structured_row(lines, db_fields, fileType="image")
+
+        if not extracted:
+            raise ValueError("Could not extract any structured rows from text")
+
+        df = pd.DataFrame(extracted)
+
+    else:
+        raise ValueError("Unsupported file type")
+    
+    df_columns = df.columns.tolist()
 
     
     print(df_columns)
     print("Available DB fields: ", list(displayNames.keys()))
 
-    db_fields = list(displayNames.keys())
 
     # "source_file", "format", "prefix", "company_trn", "company_name"
     # "month", "raw"
@@ -400,7 +444,7 @@ def add_file_to_db(contents, fileName, fullMapping=None, batch_size=500):
 
     
     print("Added New file to DB")
-    return {"status": "success", "message": f"{fileName} added to database."}
+    return {"status": "success", "message": f"{fileName} added to database.", "mapping": fullMapping}
 
 def query_new_collection(query_text, file_name, mode):
     client = chromadb.Client()

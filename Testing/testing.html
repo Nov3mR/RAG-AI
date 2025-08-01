@@ -51,7 +51,12 @@
       .query-mode-container {
         margin-bottom: 1em;
       }
+
+      .mode {
+        margin-bottom: 1em;
+      }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   </head>
   <body>
     <h1>Test /query and /upload APIs</h1>
@@ -61,11 +66,20 @@
     <label for="queryMode">Select query source:</label>
     <div class="query-mode-container">
       <select id="queryMode">
+        <option value="db_only">Only Database</option>
         <option value="both">File + Database</option>
         <option value="file_only">Only Uploaded File</option>
-        <option value="db_only">Only Database</option>
       </select>
     </div>
+
+    <label for="llmMode">Select LLM:</label>
+    <div class="mode">
+      <select name="mode" id="llmMode">
+        <option value="openai">OpenAI</option>
+        <option value="ollama">Ollama</option>
+      </select>
+    </div>
+
     <button id="sendBtn" type="button">Send Query</button>
 
     <hr />
@@ -106,7 +120,9 @@
         sendBtn.addEventListener("click", async (event) => {
           event.preventDefault();
           const query = queryInput.value.trim();
-          const mode = document.getElementById("queryMode").value;
+          const fileMode = document.getElementById("queryMode").value;
+          const llmMode = document.getElementById("llmMode").value;
+
           if (!query) {
             alert("Please enter a query");
             return;
@@ -119,7 +135,7 @@
             const response = await fetch("http://127.0.0.1:8000/query", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ query, mode }),
+              body: JSON.stringify({ query, fileMode, llmMode }),
             });
 
             if (!response.ok) {
@@ -127,15 +143,11 @@
               responseOutput.textContent = `Error: ${response.status} ${response.statusText}\n${errorText}`;
             } else {
               const data = await response.json();
-              responseOutput.innerText = `Answer: ${
-                data.answer || "No answer found"
-              } \n\nPrompt: ${data.prompt || "No prompt found"}\n\nMetadata: ${
-                data.metadata
-                  ? JSON.stringify(data.metadata, null, 2)
-                  : "No metadata found"
-              }\n\nChunks: ${
-                data.chunks ? data.chunks.join(", ") : "No chunks found"
-              }`;
+              const answer = marked.parse((data.answer || "").trim().replace(/\n{2,}/g, '\n'));
+              responseOutput.innerHTML = `<strong>Answer:</strong>${answer || "No answer found"}
+<strong>Prompt:</strong> ${data.prompt || "No prompt found"}
+<strong>Metadata:</strong> ${data.metadata ? JSON.stringify(data.metadata, null, 2) : "No metadata found"}
+<strong>Chunks:</strong> ${data.chunks ? data.chunks.join("") : "No chunks found"}`;
             }
           } catch (err) {
             responseOutput.textContent = "Fetch error: " + err.message;

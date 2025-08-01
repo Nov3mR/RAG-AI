@@ -30,24 +30,27 @@ app.state.contents = b""
 
 class Query(BaseModel):
     query: str
-    mode: Literal["file_only", "db_only", "both"] = "both" if app.state.userAddedFile else "db_only"
+    fileMode: Literal["file_only", "db_only", "both"] = "both" if app.state.userAddedFile else "db_only"
+    llmMode: Literal["openai", "ollama"] = "openai"
 
 @app.post('/query')
 async def returnResults(q: Query):
 
     query = q.query
+    mode = q.fileMode
+    llm = q.llmMode
 
     startTime = time.time()
 
     context, meta, arithmeticResult, arithmeticRow, newContext, newMeta = None, None, None, None, None, None
 
-    if app.state.userAddedFile and q.mode in ["both", "file_only"]:
-        newContext, newMeta = query_new_collection(query_text=query, file_name=app.state.fileName, mode=q.mode)
+    if app.state.userAddedFile and mode in ["both", "file_only"]:
+        newContext, newMeta = query_new_collection(query_text=query, file_name=app.state.fileName, mode=mode)
 
-    if q.mode in ["db_only", "both"]:
+    if mode in ["db_only", "both"]:
         context, meta, arithmeticResult, arithmeticRow = getResult(query)
 
-    answer = returnLLMAnswer(query=query, context=context if context else newContext, meta=meta if meta else newMeta, arithmeticResult=arithmeticResult, arithmeticRow=arithmeticRow, newContext=newContext if context else None, newMeta=newMeta if meta else None)
+    answer = returnLLMAnswer(query=query, context=context if context else newContext, meta=meta if meta else newMeta, arithmeticResult=arithmeticResult, arithmeticRow=arithmeticRow, newContext=newContext if context else None, newMeta=newMeta if meta else None, llmMode=llm)
 
     endTime = time.time()
     totalTime = endTime - startTime
@@ -84,7 +87,7 @@ async def upload_file(file: UploadFile = File(...)):
             "filename": app.state.fileName
         }
 
-    return {"filename": app.state.fileName, "contents": app.state.contents.decode("utf-8"), "message": result["message"]}
+    return {"filename": app.state.fileName, "contents": "Uploaded", "message": result["message"], "mapping": result.get("mapping", {})}
 
 @app.post('/finalize-mapping')
 async def finalize_mapping(payload: dict):
