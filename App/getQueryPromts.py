@@ -17,39 +17,6 @@ arithmeticColNames = """
 
 
 def getJsonPrompt(query: str) -> str:
-   
-    # jsonPrompt = f"""
-    # Extract structured info from the following user query:
-    
-    # Query: "{query}"
-
-    # Respond in JSON format with keys mentioned below. Only return keys that are present in the user query.
-
-    # KEYS: 
-    # {colNames}
-
-    # DO NOT INCLUDE KEYS THAT ARE NOT PRESENT IN THE USER QUERY
-
-    # DO NOT INCLUDE ANY EXPLANATION OR ADDITIONAL TEXT
-
-    # Make sure you return the keys as they are
-
-    # Convert any dates into the form MM/D/2024
-
-    # AGAIN DO NOT INCLUDE KEYS THAT ARE NOT PRESENT IN THE USER QUERY 
-
-    # This MUST be the format
-    # DO NOT ADD ANY PLAINTEXT
-
-    # {{
-    # "<key_name_1>": "<value_1>",
-    # "<key_name_2>": "<value_2>"
-    # }}
-
-    # IF THERE IS NO DATA FOR THE VALUE, DO NOT INCLUDE KEY
-
-    # DO NOT ADD ANY EXPLANATION OR EXTRA TEXT
-    # """
 
     jsonPrompt = f"""
     You are a data extraction system.
@@ -119,31 +86,6 @@ def getJsonPrompt(query: str) -> str:
 
 
 def getNewPrompt(query: str, conversationHistory: str) -> str:
-
-    # newPrompt = f"""
-    # You are a system that rewrites natural language queries into a concise and searchable format. This query is about data from te year 2024
-
-    # Instructions:
-    # - Rewrite the query using relevant keywords such as "invoice number", "vat amount", "supplier name", "customer name", etc.
-    # - Keep the query short, clear, and aligned with how invoice data is stored.
-    # - Remove all unnecessary filler words.
-    # - Return only the rewritten query as plain text. No JSON, no explanations.
-
-    # Examples:
-
-    # User: What year was invoice number 300545025110003 generated?  
-    # Response: invoice number 300545025110003 generation year
-
-    # User: How much VAT did we pay to ABC LTD in May?  
-    # Response: vat paid to abc ltd may
-
-    # User: Which invoices from June have pending VAT?  
-    # Response: pending vat invoices june
-
-    # Now rewrite this query: {query}
-    # """
-
-
     prompt = f"""
 You are a helpful assistant that rewrites user questions to include necessary context from the previous conversation, 
 so that they can be better understood when retrieving information from a database.

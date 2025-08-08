@@ -69,8 +69,6 @@ def loadOrCreateEmbeddings():
             "other": [meta["other"] for meta in metas],
             "raw": [meta["chunk"] for meta in metas],
             "id": [f"chunk_{i}" for i in range(len(chunks))]
-            # "company_name": metas["company_name"][0] if "company_name" in metas else None,  # Assuming all chunks have the same company name
-            # "trn": metas["trn"][0] if "trn" in metas else None,  # Assuming all chunks have the same TRN
         })
         df.to_parquet(CACHE_PATH, index=False)
         print("Embeddings cached")
@@ -258,9 +256,6 @@ def rank_other_chunks(query, raw, chunks, metadatas, ids, distances):
     cos_scores = F.cosine_similarity(query_embedding.unsqueeze(0), chunk_embeddings, dim=1) 
     cos_scores = cos_scores.tolist() 
 
-    # cos_scores = util.cos_sim(query_embedding, chunk_embeddings)
-
-
     top_results = sorted(list(zip(raw, cos_scores, chunks, metadatas, ids, distances)), key=lambda x: x[1], reverse=True)
 
     ranked_raw = [r for r, _, _, _, _, _ in top_results]
@@ -402,11 +397,10 @@ def query_chroma(collection, query_text, original_query, n_results, json_query, 
             query_embeddings=embedded_query,
             n_results=n_results,
             where={
-                # "$and": [
-                #     {"invoice_no": {"$in": invoice_matches if len(invoice_matches) > 0 else json_invoices}},
-                #     {"month": {"$in": months if months else allMonths}}
-                # ]
-                "invoice_no": {"$in": invoice_matches if len(invoice_matches) > 0 else json_invoices}
+                "$and": [
+                    {"invoice_no": {"$in": invoice_matches if len(invoice_matches) > 0 else json_invoices}},
+                    {"month": {"$in": months if months else allMonths}}
+                ]
             }
         )
 

@@ -44,9 +44,6 @@ def extract_json_from_llm_response(response: str):
             raise e
     return result
 
-
-
-
 def extract_text_from_pdf(contents):
     try:
         with pdfplumber.open(BytesIO(contents)) as pdf:
@@ -293,11 +290,6 @@ def add_file_to_db(contents, fileName, fullMapping=None, batch_size=500):
         lines = [line.strip() for line in text.split('\n') if line.strip()]
         print("Extracted text from PDF:", lines)  # Print first 1000 characters for debugging
 
-        # for line in lines:
-        #     extracted = extract_structured_row(line)
-        #     if extracted:
-        #         structured_data.append(extracted)
-
         extracted = extract_structured_row(lines, db_fields, fileType="PDF")
         
 
@@ -313,12 +305,6 @@ def add_file_to_db(contents, fileName, fullMapping=None, batch_size=500):
         text = extract_text_from_image(contents)
         print("Extracted text from image:", text)  # Print first 1000 characters for debugging
         lines = [line.strip() for line in text.split('\n') if line.strip()]
-
-
-        # for line in lines:
-        #     extracted = extract_structured_row(line)
-        #     if extracted:
-        #         structured_data.append(extracted)
         extracted = extract_structured_row(lines, db_fields, fileType="image")
 
         if not extracted:
@@ -334,10 +320,6 @@ def add_file_to_db(contents, fileName, fullMapping=None, batch_size=500):
     
     print(df_columns)
     print("Available DB fields: ", list(displayNames.keys()))
-
-
-    # "source_file", "format", "prefix", "company_trn", "company_name"
-    # "month", "raw"
 
     model = SentenceTransformer("intfloat/e5-small-v2")
 
@@ -410,21 +392,6 @@ def add_file_to_db(contents, fileName, fullMapping=None, batch_size=500):
     metadatas = df[["source_file", "format", "prefix", "company_trn", "company_name", "name", "voucher_no", "invoice_no", "invoice_date", "due_date", "total_invoice_amount", "vat_amount", "amount_paid", "amount_pending", "days_due", "date_received", "trn", "location", "customs_auth", "customs_number", "vat_recovered", "vat_adjustments", "month", "raw", "other"]].to_dict(orient="records")
     ids = df["id"].tolist()
 
-    # def batch_upsert():
-    #     for i in range(0, len(documents), batch_size):
-
-    #         batch_metadatas = []
-    #         for meta in metadatas[i:i+batch_size]:
-    #             clean_meta = {str(k): (v if isinstance(v, (str, int, float, bool)) or v is None else str(v)) for k, v in meta.items()}
-    #             batch_metadatas.append(clean_meta)
-
-    #         collection.upsert(
-    #             documents=documents[i:i+batch_size],
-    #             embeddings=embeddings[i:i+batch_size],
-    #             metadatas=batch_metadatas,
-    #             ids=ids[i:i+batch_size]
-    #         )
-
     def batch_add():
         for i in range(0, len(documents), batch_size):
             # Ensure each metadata dict has only str keys and values of allowed types
@@ -452,7 +419,7 @@ def query_new_collection(query_text, file_names, mode, file_ids=None, conversati
 
 
     client = chromadb.Client()
-    collection = client.get_collection(name="NewFiles") #Can add functionaloty to search a single uploaded file by passing file_names as a parameter
+    collection = client.get_collection(name="NewFiles") #Can add functionality to search a single uploaded file by passing file_names as a parameter
 
     if mode == "file_only":
         top_k = 5

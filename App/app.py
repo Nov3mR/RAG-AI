@@ -12,10 +12,6 @@ from getLLMAnswer import *
 
 os.environ["HF_HUB_DISABLE_SSL_VERIFICATION"] = "1"
 
-model3 = SentenceTransformer("multi-qa-MiniLM-L6-cos-v1")
-model4 = SentenceTransformer("msmarco-distilbert-base-v4")
-model5 = SentenceTransformer("BAAI/bge-base-en-v1.5")
-
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,

@@ -71,45 +71,7 @@ def load_all_data():
                 df = load_format_a(df)
                 vat_dfs.append((file, df, format, month))   
                
-    return vat_dfs, aging_dfs
-
-# def row_to_chunk_json_with_invoice(row):
-#     data = {
-#         k.strip(): v
-#         for k, v in row.items()
-#         if pd.notnull(v) and not str(v).strip().lower() in ["-", "nan", "none"]
-#     }
-
-
-#     invoice_no_key = next(
-#         (key for key in data if "invoice" in key.lower() and "no" in key.lower()), 
-#         None
-#     )
-
-#     invoice_no = str(data[invoice_no_key]).strip().lower() if invoice_no_key else None
-
-#     trn_key = next(
-#         (key for key in data if "supplier trn" in key.lower() or "customer trn" in key.lower()), 
-#         None
-#     )
-
-#     if trn_key and trn_key in data:
-#         val = data[trn_key]
-#         try:
-#             # Try to convert to float then int to remove trailing .0 if numeric
-#             trn = str(int(float(val)))
-#         except (ValueError, TypeError):
-           
-#             val_str = str(val).strip().lower()
-#             if val_str.endswith(".0"):
-#                 val_str = val_str[:-2]
-#             trn = val_str
-#     else:
-#         trn = "N/A"
-
-#     # N/A for SAR, 3, 6, 7
-
-#     return invoice_no, trn
+    return
 
 def clean_vals(val):
     valStr = str(val)

@@ -9,7 +9,6 @@ def returnLLMAnswer(query, context=None, meta=None, arithmeticResult=None, arith
     """
 
     if arithmeticResult and isinstance(arithmeticResult, float) and (arithmeticRow == "" or arithmeticRow is None):
-        # answer = f"The result is: {arithmeticResult:,.2f}"
         context = ""
         if newMeta is not None and newContext is not None:
             context = context if context is not None else "" + "\n" + newContext
@@ -20,7 +19,6 @@ def returnLLMAnswer(query, context=None, meta=None, arithmeticResult=None, arith
         llmAnswer = call_LLM(prompt=prompt, mode=llmMode)
         answer = llmAnswer
     elif arithmeticResult and (arithmeticRow == "" or arithmeticRow is None):
-        # answer = f"The result is: {arithmeticResult}"
         context = ""
         if newMeta is not None and newContext is not None:
             context = context if context is not None else "" + "\n" + newContext
@@ -45,9 +43,7 @@ def returnLLMAnswer(query, context=None, meta=None, arithmeticResult=None, arith
 
         prompt = history_context + returnArithmeticQuery(context=context, meta=meta, query=query, arithmetic=arithmeticResult)
         print("Calling LLM for Arithmetic Prompt")
-        # answer = f"The result is: {arithmeticResult}"
         llmAnswer = call_LLM(prompt=prompt, mode=llmMode)
-        # answer += f"\n{llmAnswer}"
         answer = llmAnswer
     else:
         if newMeta is not None and newContext is not None:
