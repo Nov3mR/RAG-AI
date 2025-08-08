@@ -75,6 +75,8 @@ def getJsonPrompt(query: str) -> str:
 
     INCLUDE Month as a key if the query mentions a specific month. If there are multiple months, return as a list of months.
 
+    IF there are multiple values for a key, return them as a list.
+
     Examples of Months are: January, February, March, April, May, June, July, August, September, October, November, December
 
     If query is about the Supplier Aging Report, the month key should have the value "SAR"
@@ -116,7 +118,7 @@ def getJsonPrompt(query: str) -> str:
     return jsonPrompt.strip()
 
 
-def getNewPrompt(query: str) -> str:
+def getNewPrompt(query: str, conversationHistory: str) -> str:
 
     # newPrompt = f"""
     # You are a system that rewrites natural language queries into a concise and searchable format. This query is about data from te year 2024
@@ -142,33 +144,20 @@ def getNewPrompt(query: str) -> str:
     # """
 
 
-    newPrompt = f"""
-    You are a helpful assistant. Your task is to rewrite the following user query to make it better for searching a structured document database.
+    prompt = f"""
+You are a helpful assistant that rewrites user questions to include necessary context from the previous conversation, 
+so that they can be better understood when retrieving information from a database.
 
-    Focus only on the essential searchable terms. Do not explain anything. Do not include reasoning. Do not include any JSON formatting.
+Conversation history:
+{conversationHistory}
 
-    ❗Return only a plain string — no punctuation, no JSON, no explanation.
+User's current question:
+{query}
 
-    For context, these are the column names of the database. IT IS NOT DATA
-    {colNames}
-
-    Examples:
-
-    User: What year was the invoice number 300545025110003 generated?
-    Rewritten: invoice number 300545025110003 invoice date year
-
-    User: How much VAT did we pay to supplier ACER in May?
-    Rewritten: vat amount supplier acer may
-
-    User: Why was the invoice from EMPO on 9th September out-of-scope?
-    Rewritten: invoice empo 9 september out-of-scope reason
-
-    Now rewrite this:
-    \"\"\"{query}\"\"\"
-
-    Rewritten:
-    """
-    return newPrompt.strip()
+Rewrite the user's current question to include relevant context from the conversation history in a concise way.
+Return only the rewritten question.
+"""
+    return prompt.strip()
 
 def getArithmeticPrompt(query: str) -> str:
     arithmeticPrompt = f"""

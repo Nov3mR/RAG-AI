@@ -3,18 +3,19 @@ from getQueryPromts import *
 import json
 import re
 
-def returnNewQuery(query: str):
+
+def returnNewQuery(query, conversationHistory):
 
     jsonPrompt = getJsonPrompt(query)
-    newQueryPrompt = getNewPrompt(query)
+    newQueryPrompt = getNewPrompt(query, conversationHistory)
 
     jsonResponse, newQueryResponse = "", ""
 
     print("Calling LLM for JSON Prompt")
     jsonResponse = call_LLM(jsonPrompt)
     print(jsonResponse)
-    # print("Calling LLM for New Query Prompt")
-    # newQueryResponse = call_LLM(newQueryPrompt)
+    print("Calling LLM for New Query Prompt")
+    newQueryResponse = call_LLM(newQueryPrompt)
     print(newQueryResponse)
 
     cleaned = re.sub(r"^```(?:json)?\n?", "", jsonResponse.strip(), flags=re.IGNORECASE)

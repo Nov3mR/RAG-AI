@@ -327,15 +327,16 @@ def query_by_format_priority(collection, query_text, embedded_query, format_prio
 
     return results, raw
 
-def query_chroma(collection, query_text, original_query, n_results, json_query, format=None):
-    query_text = query_text.lower()
-    original_query = original_query.lower()
+def query_chroma(collection, query_text, original_query, n_results, json_query, format=None, contextual_query=None):
+    query_text = contextual_query.lower() if contextual_query else query_text.lower()
+    original_query = contextual_query.lower() if contextual_query else original_query.lower()
+    contextual_query = contextual_query.lower() if contextual_query else ""
 
     raw = []
     jsonMonths = []
     invoice_matches = []
-    
-    embedded_query = model.encode([query_text]).tolist()
+
+    embedded_query = model.encode([contextual_query if contextual_query else query_text]).tolist()
 
     if format == "New":
         formats = ["New"]
@@ -344,7 +345,7 @@ def query_chroma(collection, query_text, original_query, n_results, json_query, 
         formats = find_query_format(query_text)
         allFormats = ["SAR", "Box 1", "Box 3", "Box 4", "Box 6/7", "Box 9", "OOS"]
 
-    allMonths = ["may", "june", "july", "august", "september", "sar", "other"]
+    allMonths = ["may", "june", "july", "august", "september", "sar", "other", "N/A"]
     months = []
     if json_query != "":
         for col, data in json_query.items():
@@ -368,7 +369,6 @@ def query_chroma(collection, query_text, original_query, n_results, json_query, 
 
     print(original_query)
     invoice_matches = re.findall(invoice_pattern, original_query, re.IGNORECASE)
-    json_invoice_matches = re.findall(json_invoice_pattern, original_query, re.IGNORECASE)
     trn_matches = re.findall(trn_pattern, original_query, re.IGNORECASE)
     month_matches = re.findall(month_pattern, original_query, re.IGNORECASE)
 
@@ -380,27 +380,58 @@ def query_chroma(collection, query_text, original_query, n_results, json_query, 
         months = month_matches
 
     json_invoices = []
-    if json_invoice_matches:
-        for invoice in json_invoice_matches:
-            json_invoices.append(invoice[2])
+    if isinstance(json_query, dict) and "Invoice No" in json_query:
+        if isinstance(json_query["Invoice No"], list):
+            json_invoices = [item.lower() for item in json_query["Invoice No"] if item]
+        else:
+            json_invoices = [json_query["Invoice No"].lower()]
 
     print("Detected invoice numbers in query: ", invoice_matches)
     print("Detected JSON invoice numbers in query: ", json_invoices)
 
-    if len(invoice_matches) > 0 or len(json_invoice_matches) > 0:
-        print([f"Detected invoice numbers in query: {match}" for match in invoice_matches])
+    if len(invoice_matches) > 0 or len(json_invoices) > 0:
+        print([f"Detected invoice numbers in query: {match}" for match in (invoice_matches if len(invoice_matches) > 0 else json_invoices)])
+
+        print("invoices:", invoice_matches if len(invoice_matches) > 0 else json_invoices)
+        print("months:", months if months else allMonths)
+        print("n_results:", n_results)
+
+        # print a list of invoice numbers in the collection
+        
         results = collection.query(
             query_embeddings=embedded_query,
             n_results=n_results,
             where={
-                "$and": [
-                    {"invoice_no": {"$in": invoice_matches if invoice_matches else json_invoices}},
-                    {"month": {"$in": months if months else allMonths}}
-                ]
+                # "$and": [
+                #     {"invoice_no": {"$in": invoice_matches if len(invoice_matches) > 0 else json_invoices}},
+                #     {"month": {"$in": months if months else allMonths}}
+                # ]
+                "invoice_no": {"$in": invoice_matches if len(invoice_matches) > 0 else json_invoices}
             }
         )
 
-        raw = [meta["raw"] for sublist in results["metadatas"] for meta in sublist]
+        print("Results found for invoice numbers:", results["documents"])
+
+        if not results["documents"]:
+            print("No results found for Invoices, searching by raw text.")
+            if len(formats) > 0:
+                print("No invoice number detected, searching priority formats.")
+                print(formats)
+
+                if len(formats) >= n_results:
+                    top_k = 1
+                elif len(formats) == 1:
+                    top_k = n_results
+                else:
+                    top_k = math.ceil(n_results / len(formats))
+
+                results, raw = query_by_format_priority(collection, query_text, embedded_query, formats, top_k, n_results, months=months if months else allMonths)
+            else:
+                print("No formats detected, running general semantic search.")
+                results, raw = query_by_format_priority(collection, query_text, embedded_query, allFormats, 1, 7, months=months if months else allMonths)
+                results, raw = rank_other_chunks(query_text, raw, results["documents"], results["metadatas"], results["ids"], results["distances"])
+        else:
+            raw = [meta["raw"] for sublist in results["metadatas"] for meta in sublist]
 
     elif len(trn_matches) > 0:
         print([f"Detected TRN numbers in query: {match}" for match in trn_matches])
@@ -414,7 +445,29 @@ def query_chroma(collection, query_text, original_query, n_results, json_query, 
                 ]
             }
         )
-        raw = [meta["raw"] for sublist in results["metadatas"] for meta in sublist]
+
+        # If no results found, try searching by raw text
+        if not results["documents"]:
+            print("No results found for TRN, searching by raw text.")
+            if len(formats) > 0:
+                print("No invoice number detected, searching priority formats.")
+                print(formats)
+
+                if len(formats) >= n_results:
+                    top_k = 1
+                elif len(formats) == 1:
+                    top_k = n_results
+                else:
+                    top_k = math.ceil(n_results / len(formats))
+
+                results, raw = query_by_format_priority(collection, query_text, embedded_query, formats, top_k, n_results, months=months if months else allMonths)
+            else:
+                print("No formats detected, running general semantic search.")
+                results, raw = query_by_format_priority(collection, query_text, embedded_query, allFormats, 1, 7, months=months if months else allMonths)
+                results, raw = rank_other_chunks(query_text, raw, results["documents"], results["metadatas"], results["ids"], results["distances"])
+        else:
+            raw = [meta["raw"] for sublist in results["metadatas"] for meta in sublist]
+
         
     elif len(formats) > 0:
         print("No invoice number detected, searching priority formats.")
@@ -549,14 +602,14 @@ def perform_arithmetic_from_llm(df: pd.DataFrame, llm_json: Union[str, dict]):
 
     return result, resultRow if resultRow != [] else ""
 
-def retrieve_relevant_chunks(query, top_k=5):
+def retrieve_relevant_chunks(query, top_k=5, conversationHistory=None):
 
     df = loadOrCreateEmbeddings()
     collection = chromaDBSetup(df)
 
     jsonQuery, newQuery, parsed, searchQuery = "", "", "", ""
 
-    jsonQuery, newQuery = returnNewQuery(query=query)
+    jsonQuery, newQuery = returnNewQuery(query=query, conversationHistory=conversationHistory)
 
     try:
         match = re.search(r"\{.*?\}", jsonQuery, re.DOTALL)
@@ -573,7 +626,7 @@ def retrieve_relevant_chunks(query, top_k=5):
 
     print(searchQuery)
 
-    results, raw = query_chroma(collection, searchQuery.lower() if searchQuery != "" else query.lower(), original_query=query.lower(), n_results=top_k, json_query=parsed) # searchQuery.lower() if searchQuery != "" else newQuery
+    results, raw = query_chroma(collection, searchQuery.lower() if searchQuery != "" else query.lower(), original_query=query.lower(), n_results=top_k, json_query=parsed, contextual_query=newQuery) # searchQuery.lower() if searchQuery != "" else newQuery
     
     needArithmetic = False
     if len(results["ids"]) > 1:
@@ -610,9 +663,9 @@ def retrieve_relevant_chunks(query, top_k=5):
 
     return results["documents"], results["metadatas"], results["ids"], originalText, query, [arithmeticResult, [result['raw'] for result in resultRow] if resultRow != "" else ""] if needArithmetic else None
 
-def getResult(query, newFile=None):
+def getResult(query, newFile=None, conversationHistory=None):
 
-    topChunks, topMetas, topIds, originalText, query, arithmetic = retrieve_relevant_chunks(query=query)
+    topChunks, topMetas, topIds, originalText, query, arithmetic = retrieve_relevant_chunks(query=query, conversationHistory=conversationHistory)
     arithmeticResult = None
     arithmeticRow = ""
 

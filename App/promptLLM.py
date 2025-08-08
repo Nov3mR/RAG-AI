@@ -8,7 +8,7 @@ OLLAMA_MODEL = "phi3:3.8b"
 
 load_dotenv()
 openai.api_key = os.getenv("openAIAPIKey")
-openaiModel = "gpt-4o-mini"
+openaiModel = "gpt-4.1-mini"
 
 def call_LLM(prompt: str, mode="openai") -> str:
     payload = {
@@ -38,3 +38,7 @@ def call_LLM(prompt: str, mode="openai") -> str:
         except requests.exceptions.RequestException as e:
             print("Ollama call failed:", e)
             return "Error: Could not get a response from the LLM"
+        
+if __name__ == "__main__":
+    test_prompt = "Hello"
+    print(call_LLM(test_prompt, mode="openai")) # Ensure Ollama is running to test this

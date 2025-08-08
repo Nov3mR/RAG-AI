@@ -366,7 +366,7 @@ def add_file_to_db(contents, fileName, fullMapping=None, batch_size=500):
 
 
     chunks, metas = new_df_to_chunks(df=df, filename=fileName, fullMapping=fullMapping)
-    collection_name = fileName.replace(".", "_")
+    collection_name = "NewFiles"
 
     embeddings = model.encode(chunks, show_progress_bar=True)
 
@@ -403,6 +403,7 @@ def add_file_to_db(contents, fileName, fullMapping=None, batch_size=500):
 
     client = chromadb.Client()
     collection = client.get_or_create_collection(name=collection_name)
+    print("Metadata:", df[["source_file","invoice_no", "other", "month"]].to_dict(orient="records"))
 
     documents = df["chunk"].astype(str).tolist()
     embeddings = df["embedding"].tolist()
@@ -442,13 +443,17 @@ def add_file_to_db(contents, fileName, fullMapping=None, batch_size=500):
 
     batch_add()
 
-    
     print("Added New file to DB")
     return {"status": "success", "message": f"{fileName} added to database.", "mapping": fullMapping}
 
-def query_new_collection(query_text, file_name, mode):
+def query_new_collection(query_text, file_names, mode, file_ids=None, conversationHistory=None):
+    print("Available files", file_names)
+    print("IDs", file_ids)
+
+
     client = chromadb.Client()
-    collection = client.get_collection(name=file_name.replace(".", "_"))
+    collection = client.get_collection(name="NewFiles") #Can add functionaloty to search a single uploaded file by passing file_names as a parameter
+
     if mode == "file_only":
         top_k = 5
     else:
@@ -456,7 +461,7 @@ def query_new_collection(query_text, file_name, mode):
 
     jsonQuery, newQuery, parsed, searchQuery = "", "", "", ""
 
-    jsonQuery, newQuery = returnNewQuery(query=query_text)
+    jsonQuery, newQuery = returnNewQuery(query=query_text, conversationHistory=conversationHistory)  # Pass conversation history if needed
     print("JSON QUERY:", jsonQuery)
 
     try:
@@ -474,7 +479,7 @@ def query_new_collection(query_text, file_name, mode):
 
     print(searchQuery)
 
-    results, raw = query_chroma(collection, searchQuery.lower() if searchQuery != "" else query_text.lower(), original_query=query_text.lower(), n_results=top_k, json_query=parsed, format="New") # searchQuery.lower() if searchQuery != "" else newQuery
+    results, raw = query_chroma(collection, searchQuery.lower() if searchQuery != "" else query_text.lower(), original_query=query_text.lower(), n_results=top_k, json_query=parsed, format="New", contextual_query=newQuery) # searchQuery.lower() if searchQuery != "" else newQuery
 
     #Can add ability to do arithmetic operations here if needed by adding code from retrieve_relevant_chunks
 

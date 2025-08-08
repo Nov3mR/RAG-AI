@@ -85,7 +85,7 @@
     <hr />
 
     <label for="fileInput">Upload a new file:</label>
-    <input type="file" id="fileInput" />
+    <input type="file" id="fileInput" multiple />
     <button id="uploadBtn" type="button">Upload File</button>
 
     <h2>Response:</h2>
@@ -143,11 +143,7 @@
               responseOutput.textContent = `Error: ${response.status} ${response.statusText}\n${errorText}`;
             } else {
               const data = await response.json();
-              const answer = marked.parse((data.answer || "").trim().replace(/\n{2,}/g, '\n'));
-              responseOutput.innerHTML = `<strong>Answer:</strong>${answer || "No answer found"}
-<strong>Prompt:</strong> ${data.prompt || "No prompt found"}
-<strong>Metadata:</strong> ${data.metadata ? JSON.stringify(data.metadata, null, 2) : "No metadata found"}
-<strong>Chunks:</strong> ${data.chunks ? data.chunks.join("") : "No chunks found"}`;
+              responseOutput.textContent = data.answer || "No answer found";
             }
           } catch (err) {
             responseOutput.textContent = "Fetch error: " + err.message;
@@ -158,8 +154,8 @@
 
         uploadBtn.addEventListener("click", async (event) => {
           event.preventDefault();
-          const file = fileInput.files[0];
-          if (!file) {
+          const files = document.getElementById("fileInput").files;
+          if (files.length === 0 || !files[0]) {
             alert("Please select a file to upload.");
             return;
           }
@@ -168,85 +164,89 @@
           responseOutput.textContent = "Uploading file...";
 
           try {
-            const formData = new FormData();
-            formData.append("file", file);
-
-            const response = await fetch("http://127.0.0.1:8000/upload", {
-              method: "POST",
-              body: formData,
-            });
-
-            const data = await response.json();
-
-            if (data.status === "partial_mapping") {
-              responseOutput.textContent =
-                "Some columns couldn't be mapped. Please review below.";
-              document.getElementById("mappingContainer").style.display =
-                "block";
-
-              const fieldsDiv = document.getElementById("mappingFields");
-              fieldsDiv.innerHTML = ""; // Clear previous
-
-              const fieldDisplayNames = data.fieldDisplayNames || {};
-
-              Object.entries(data.mapping || {}).forEach(([src, dst]) => {
-                const displayDst = fieldDisplayNames[dst] || dst;
-
-                fieldsDiv.innerHTML += `
-                <label>${src} → ${displayDst}</label><br/>
-                <input type="hidden" name="${src}" value="${dst}" />
-              `;
+            for (const file of files) {
+              const formData = new FormData();
+              formData.append("file", file);                
+              
+              const response = await fetch("http://127.0.0.1:8000/upload", {
+                method: "POST",
+                body: formData,
               });
-
-              // Add unmapped fields with dropdown suggestions
-              (data.unmapped || []).forEach((col) => {
-                const options = (data.fields_left || [])
+              
+              const data = await response.json();
+              
+              if (data.status === "partial_mapping") {
+                responseOutput.textContent =
+                "Some columns couldn't be mapped. Please review below.";
+                document.getElementById("mappingContainer").style.display =
+                "block";
+                
+                const fieldsDiv = document.getElementById("mappingFields");
+                fieldsDiv.innerHTML = ""; // Clear previous
+                
+                const fieldDisplayNames = data.fieldDisplayNames || {};
+                
+                Object.entries(data.mapping || {}).forEach(([src, dst]) => {
+                  const displayDst = fieldDisplayNames[dst] || dst;
+                  
+                  fieldsDiv.innerHTML += `
+                  <label>${src} → ${displayDst}</label><br/>
+                  <input type="hidden" name="${src}" value="${dst}" />
+                  `;
+                });
+                
+                // Add unmapped fields with dropdown suggestions
+                (data.unmapped || []).forEach((col) => {
+                  const options = (data.fields_left || [])
                   .map((field) => {
                     const selected =
-                      data.suggestions?.[col] === field ? "selected" : "";
+                    data.suggestions?.[col] === field ? "selected" : "";
                     const label = fieldDisplayNames[field] || field;
                     return `<option value="${field}" ${selected}>${label}</option>`;
                   })
                   .join("");
-
-                fieldsDiv.innerHTML += `
+                  
+                  fieldsDiv.innerHTML += `
                   <label>${col} (unmapped)</label>
                   <select name="${col}" required>
                     <option value="">-- Select field --</option>
                     ${options}
-                  </select><br/>
-                `;
-              });
+                    </select><br/>
+                    `;
+                  });
+                  
+                  // Save file metadata
+                  localStorage.setItem("uploadedFileName", data.filename);
+                  localStorage.setItem(
+                    "uploadedFileContents",
+                    JSON.stringify(data.contents)
+                  );
+                  localStorage.setItem("file_id_" + data.filename, data.fileId);
 
-              // Save file metadata
-              localStorage.setItem("uploadedFileName", data.filename);
-              localStorage.setItem(
-                "uploadedFileContents",
-                JSON.stringify(data.contents)
-              );
-              window.uploadedFileName = data.filename;
-              window.uploadedFileContents = data.contents;
-
-              window.unmapped = data.unmapped || [];
-              localStorage.setItem("unmapped", JSON.stringify(window.unmapped));
-
-              console.log(
-                "Saved to window:",
-                window.uploadedFileName,
-                window.uploadedFileContents
-              );
-              console.log(
-                "Saved to localStorage:",
-                localStorage.getItem("uploadedFileName"),
-                localStorage.getItem("uploadedFileContents")
-              );
-            } else {
-              responseOutput.textContent = `File uploaded successfully.\n\nResponse: ${JSON.stringify(
-                data,
-                null,
-                2
-              )}`;
-            }
+                  window.uploadedFileName = data.filename;
+                  window.uploadedFileContents = data.contents;
+                  
+                  window.unmapped = data.unmapped || [];
+                  localStorage.setItem("unmapped", JSON.stringify(window.unmapped));
+                  
+                  console.log(
+                    "Saved to window:",
+                    window.uploadedFileName,
+                    window.uploadedFileContents
+                  );
+                  console.log(
+                    "Saved to localStorage:",
+                    localStorage.getItem("uploadedFileName"),
+                    localStorage.getItem("uploadedFileContents")
+                  );
+                } else {
+                  responseOutput.textContent = `File uploaded successfully.\n\nResponse: ${JSON.stringify(
+                    data,
+                    null,
+                    2
+                  )}`;
+                }
+              }
           } catch (err) {
             responseOutput.textContent = "Upload error: " + err.message;
           } finally {
@@ -308,6 +308,7 @@
               filename: window.uploadedFileName,
               contents: window.uploadedFileContents,
               mapping: mapping,
+              fileId: localStorage.getItem("file_id_" + window.uploadedFileName)
             };
 
             responseOutput.textContent = "Submitting final mapping...";
@@ -334,6 +335,7 @@
                 "none";
 
               // Clear metadata after submit
+              localStorage.removeItem("file_id_" + data.fileName);
               localStorage.removeItem("uploadedFileName");
               localStorage.removeItem("uploadedFileContents");
               localStorage.removeItem("fieldsLeft");
